@@ -26,7 +26,8 @@
     "no-shadow": "off",
     "no-underscore-dangle": "off",
     "no-plusplus": "off",
-    "default-case": "off"
+    "default-case": "off",
+    "no-undef": "off"
   },
   "settings": {
     "import/resolver": {
