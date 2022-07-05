@@ -25,7 +25,8 @@
     "func-names": "off",
     "no-shadow": "off",
     "no-underscore-dangle": "off",
-    "no-plusplus": "off"
+    "no-plusplus": "off",
+    "default-case": "off"
   },
   "settings": {
     "import/resolver": {

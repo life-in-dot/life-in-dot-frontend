@@ -3,7 +3,9 @@ import { useRecoilState } from "recoil";
 import styled from "styled-components";
 
 import birthdayState from "../../lib/recoil/user";
+
 import useInputs from "../../lib/hooks/useInputs";
+import useModal from "../../lib/hooks/useModal";
 import calculateBirthday from "../../lib/utils/calculateBirthday";
 
 function MainPage() {
@@ -14,6 +16,7 @@ function MainPage() {
     birthMonth: "",
     birthDay: "",
   });
+  const { showModal, hideModal } = useModal();
 
   const handleWheelChange = e => calculateBirthday(e, birthday, setBirthday);
 
@@ -23,6 +26,12 @@ function MainPage() {
     onChange({ target: { name: "birthYear", value: year } });
     onChange({ target: { name: "birthMonth", value: month } });
     onChange({ target: { name: "birthDay", value: day } });
+  };
+
+  const handleLoginClick = () => {
+    showModal({
+      modalType: "LoginModal",
+    });
   };
 
   return (
@@ -50,7 +59,9 @@ function MainPage() {
               onWheel={handleWheelChange}
             />
           </InputWrapper>
-          <button type="submit">Login</button>
+          <button type="submit" onClick={handleLoginClick}>
+            Login
+          </button>
         </Wrapper>
       </form>
     </>
