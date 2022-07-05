@@ -6,6 +6,7 @@ import { ErrorBoundary } from "react-error-boundary";
 
 import styled from "styled-components";
 
+import GlobalModal from "../GlobalModal";
 import AppHeader from "../AppHeader";
 import ProtectedRoute from "../ProtectedRoute";
 
@@ -44,6 +45,7 @@ function App() {
                 </>
               )}
             >
+              <GlobalModal />
               <AppHeader />
               <Main>
                 <Routes>
