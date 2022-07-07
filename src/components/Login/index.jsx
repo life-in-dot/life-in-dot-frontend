@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useSetRecoilState, useRecoilValue } from "recoil";
 import { useMutation } from "react-query";
 
@@ -14,8 +14,9 @@ import config from "../../lib/config";
 import useModal from "../../lib/hooks/useModal";
 
 function Login() {
+  const navigate = useNavigate();
   const setLoginState = useSetRecoilState(loginState);
-  const dateOfBirth = useRecoilValue(birthday);
+  const dateOfBirthObj = useRecoilValue(birthday);
   const loginMutation = useMutation(login);
   const { hideModal } = useModal();
 
@@ -27,6 +28,8 @@ function Login() {
 
   const handleLogin = async response => {
     const { name, email, picture } = decodeJWT(response.credential);
+    const { year, month, day } = dateOfBirthObj;
+    const dateOfBirth = `${year}-${month}-${day}`;
 
     loginMutation.mutate(
       { name, email, picture, dateOfBirth },
@@ -36,7 +39,7 @@ function Login() {
           localStorage.setItem("loginData", JSON.stringify(data));
 
           hideModal();
-          <Navigate to="/life" replace={true} />;
+          navigate("/life", { replace: true });
         },
       },
     );
