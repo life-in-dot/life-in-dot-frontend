@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 
 import styled from "styled-components";
+import GlobalStyle from "../../styles/GlobalStyle";
 
 import GlobalModal from "../GlobalModal";
 import AppHeader from "../AppHeader";
@@ -45,6 +46,7 @@ function App() {
                 </>
               )}
             >
+              <GlobalStyle />
               <GlobalModal />
               <AppHeader />
               <Main>
@@ -64,8 +66,6 @@ function App() {
   );
 }
 
-const Main = styled.main`
-  margin-top: 30px;
-`;
+const Main = styled.main``;
 
 export default App;
