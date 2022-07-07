@@ -73,7 +73,9 @@ const Wrapper = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: calc(100vh - 60px);
+  margin-top: 70px;
+  height: calc(100vh - 70px);
+  width: 100%;
 `;
 
 const InputWrapper = styled.div``;
