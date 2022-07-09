@@ -1,12 +1,19 @@
 import { atom } from "recoil";
 
-const birthday = atom({
-  key: "birthday",
-  default: {
-    year: 2000,
-    month: 7,
-    day: 1,
-  },
+const today = new Date();
+const year = today.getFullYear();
+const month = today.getMonth() + 1;
+const date = today.getDate();
+
+const birthdayState = atom({
+  key: "birthdayState",
+  default: localStorage.getItem("loginData")
+    ? JSON.parse(localStorage.getItem("loginData")).data.dateOfBirth
+    : {
+        year: year - 25,
+        month,
+        date,
+      },
 });
 
-export default birthday;
+export default birthdayState;
