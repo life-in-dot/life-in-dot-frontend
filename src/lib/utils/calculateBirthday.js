@@ -1,56 +1,57 @@
 const increase = value => value + 1;
 const decrease = value => value - 1;
 
-const calYear = (deltaY, birthday, setBirthday) => {
-  const { year } = birthday;
+const calYear = (deltaY, birthday, onChange) => {
+  const { birthYear } = birthday;
 
   return deltaY > 0
-    ? setBirthday(prevState => ({ ...prevState, year: increase(year) }))
-    : setBirthday(prevState => ({ ...prevState, year: decrease(year) }));
+    ? onChange({ target: { name: "birthYear", value: increase(birthYear) } })
+    : onChange({ target: { name: "birthYear", value: decrease(birthYear) } });
 };
 
-const calMonth = (deltaY, birthday, setBirthday) => {
-  const { month } = birthday;
+const calMonth = (deltaY, birthday, onChange) => {
+  const { birthMonth } = birthday;
 
   if (deltaY > 0) {
-    return month > 11
-      ? setBirthday(prevState => ({ ...prevState, month: 1 }))
-      : setBirthday(prevState => ({ ...prevState, month: increase(month) }));
+    return birthMonth > 11
+      ? onChange({ target: { name: "birthMonth", value: 1 } })
+      : onChange({
+          target: { name: "birthMonth", value: increase(birthMonth) },
+        });
   }
 
-  return month < 2
-    ? setBirthday(prevState => ({ ...prevState, month: 12 }))
-    : setBirthday(prevState => ({ ...prevState, month: decrease(month) }));
+  return birthMonth < 2
+    ? onChange({ target: { name: "birthMonth", value: 12 } })
+    : onChange({ target: { name: "birthMonth", value: decrease(birthMonth) } });
 };
 
-const calDay = (deltaY, birthday, setBirthday) => {
-  const { day } = birthday;
+const calDay = (deltaY, birthday, onChange) => {
+  const { birthDate } = birthday;
 
   if (deltaY > 0) {
-    return day > 30
-      ? setBirthday(prevState => ({ ...prevState, day: 1 }))
-      : setBirthday(prevState => ({ ...prevState, day: increase(day) }));
+    return birthDate > 30
+      ? onChange({ target: { name: "birthDate", value: 1 } })
+      : onChange({ target: { name: "birthDate", value: increase(birthDate) } });
   }
 
-  return day < 2
-    ? setBirthday(prevState => ({ ...prevState, day: 31 }))
-    : setBirthday(prevState => ({ ...prevState, day: decrease(day) }));
+  return birthDate < 2
+    ? onChange({ target: { name: "birthDate", value: 31 } })
+    : onChange({ target: { name: "birthDate", value: decrease(birthDate) } });
 };
 
-export default function calculateBirthday(e, birthday, setBirthday) {
+export default function calculateBirthday(e, birthday, onChange) {
   const targetName = e.target.name;
   const { deltaY } = e;
 
   switch (targetName) {
     case "year":
-      calYear(deltaY, birthday, setBirthday);
+      calYear(deltaY, birthday, onChange);
       break;
     case "month":
-      calMonth(deltaY, birthday, setBirthday);
+      calMonth(deltaY, birthday, onChange);
       break;
-    case "day":
-      calDay(deltaY, birthday, setBirthday);
+    case "date":
+      calDay(deltaY, birthday, onChange);
       break;
-    default:
   }
 }
