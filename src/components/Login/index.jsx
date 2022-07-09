@@ -16,7 +16,7 @@ import useModal from "../../lib/hooks/useModal";
 function Login() {
   const navigate = useNavigate();
   const setLoginState = useSetRecoilState(loginState);
-  const dateOfBirthObj = useRecoilValue(birthday);
+  const dateOfBirth = useRecoilValue(birthday);
   const loginMutation = useMutation(login);
   const { hideModal } = useModal();
 
@@ -28,8 +28,6 @@ function Login() {
 
   const handleLogin = async response => {
     const { name, email, picture } = decodeJWT(response.credential);
-    const { year, month, day } = dateOfBirthObj;
-    const dateOfBirth = `${year}-${month}-${day}`;
 
     loginMutation.mutate(
       { name, email, picture, dateOfBirth },
