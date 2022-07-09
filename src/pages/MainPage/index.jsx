@@ -1,31 +1,37 @@
-import { useRecoilState } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 
 import styled from "styled-components";
 
-import birthdayState from "../../lib/recoil/user";
+import birthdayState, { yearsListState } from "../../lib/recoil/user";
 
 import useInputs from "../../lib/hooks/useInputs";
 import useModal from "../../lib/hooks/useModal";
 import calculateBirthday from "../../lib/utils/calculateBirthday";
 
 function MainPage() {
-  const [birthday, setBirthday] = useRecoilState(birthdayState);
-  const { year, month, day } = birthday;
-  const [{ birthYear, birthMonth, birthDay }, onChange, reset] = useInputs({
-    birthYear: "",
-    birthMonth: "",
-    birthDay: "",
+  const userBirthday = useRecoilValue(birthdayState);
+  const setHundredYears = useSetRecoilState(yearsListState);
+  const { year, month, date } = userBirthday;
+  const [{ birthYear, birthMonth, birthDate }, onChange, reset] = useInputs({
+    birthYear: year,
+    birthMonth: month,
+    birthDate: date,
   });
-  const { showModal, hideModal } = useModal();
+  const { showModal } = useModal();
 
-  const handleWheelChange = e => calculateBirthday(e, birthday, setBirthday);
+  const handleWheelChange = e => {
+    const birthday = { birthYear, birthMonth, birthDate };
+    calculateBirthday(e, birthday, onChange);
+  };
 
   const handleSubmit = e => {
     e.preventDefault();
 
-    onChange({ target: { name: "birthYear", value: year } });
-    onChange({ target: { name: "birthMonth", value: month } });
-    onChange({ target: { name: "birthDay", value: day } });
+    setHundredYears({
+      year: birthYear,
+      month: birthMonth,
+      date: birthDate,
+    });
   };
 
   const handleLoginClick = () => {
@@ -43,20 +49,23 @@ function MainPage() {
             <input
               type="number"
               name="year"
-              value={year}
+              value={birthYear}
               onWheel={handleWheelChange}
+              readOnly={true}
             />
             <input
               type="number"
               name="month"
-              value={month}
+              value={birthMonth}
               onWheel={handleWheelChange}
+              readOnly={true}
             />
             <input
               type="number"
-              name="day"
-              value={day}
+              name="date"
+              value={birthDate}
               onWheel={handleWheelChange}
+              readOnly={true}
             />
           </InputWrapper>
           <button type="submit" onClick={handleLoginClick}>
