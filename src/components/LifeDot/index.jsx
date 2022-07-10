@@ -1,17 +1,19 @@
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 
 import * as d3 from "d3";
 import PropTypes from "prop-types";
 import styled from "styled-components";
 
 import { yearsListState } from "../../lib/recoil/user";
+import targetYearState from "../../lib/recoil/days";
 
 function LifeDot() {
   const navigate = useNavigate();
   const svgRef = useRef();
   const userHundredYearsData = useRecoilValue(yearsListState);
+  const setUserOneYearData = useSetRecoilState(targetYearState);
 
   useEffect(() => {
     const width = window.innerWidth / 2;
@@ -54,10 +56,8 @@ function LifeDot() {
         const targetYear = event.target.getAttribute("class");
 
         if (zoomScale > 50000) {
-          event.target.style.transition = "opacity 1s ease-out";
-          event.target.style.opacity = "0";
-
-          navigate("/year", { replace: false, state: targetYear });
+          setUserOneYearData(+targetYear);
+          navigate("/year", { replace: false, state: +targetYear });
         }
       });
 
