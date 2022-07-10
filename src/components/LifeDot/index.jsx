@@ -11,7 +11,7 @@ import { yearsListState } from "../../lib/recoil/user";
 function LifeDot() {
   const navigate = useNavigate();
   const svgRef = useRef();
-  const hundredYears = useRecoilValue(yearsListState);
+  const userHundredYearsData = useRecoilValue(yearsListState);
 
   useEffect(() => {
     const width = window.innerWidth / 2;
@@ -39,7 +39,7 @@ function LifeDot() {
     const gYear = svg.append("g", "life-board").attr("class", "year-dots");
     gYear
       .selectAll("circle")
-      .data(hundredYears)
+      .data(userHundredYearsData)
       .join("circle")
       .attr("r", d => d.r / 10)
       .attr("cx", (d, i) => width / 2 + d.y / 10)
@@ -51,12 +51,13 @@ function LifeDot() {
       .attr("opacity", 0.5)
       .on("wheel", event => {
         const zoomScale = svg._groups[0][0].__zoom.k;
+        const targetYear = event.target.getAttribute("class");
 
         if (zoomScale > 50000) {
           event.target.style.transition = "opacity 1s ease-out";
           event.target.style.opacity = "0";
 
-          navigate("/year", { replace: false });
+          navigate("/year", { replace: false, state: targetYear });
         }
       });
 

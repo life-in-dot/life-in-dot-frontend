@@ -1,12 +1,12 @@
-export default function calculateYears(birthYear) {
-  const hundredYears = [];
+export default function calYearsData(birthYear) {
+  const hundredYearsData = [];
 
   let year = birthYear;
   let col = 1;
   let row = 1;
 
   do {
-    hundredYears.push({
+    hundredYearsData.push({
       year,
       r: 0.1,
       x: col,
@@ -17,10 +17,10 @@ export default function calculateYears(birthYear) {
     year++;
 
     if (col === 11) {
-      row++;
       col = 1;
+      row++;
     }
   } while (row < 11);
 
-  return hundredYears;
+  return hundredYearsData;
 }
