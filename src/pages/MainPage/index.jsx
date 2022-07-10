@@ -10,7 +10,7 @@ import calculateBirthday from "../../lib/utils/calculateBirthday";
 
 function MainPage() {
   const userBirthday = useRecoilValue(birthdayState);
-  const setHundredYears = useSetRecoilState(yearsListState);
+  const setUserHundredYearsData = useSetRecoilState(yearsListState);
   const { year, month, date } = userBirthday;
   const [{ birthYear, birthMonth, birthDate }, onChange, reset] = useInputs({
     birthYear: year,
@@ -27,7 +27,7 @@ function MainPage() {
   const handleSubmit = e => {
     e.preventDefault();
 
-    setHundredYears({
+    setUserHundredYearsData({
       year: birthYear,
       month: birthMonth,
       date: birthDate,
