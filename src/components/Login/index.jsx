@@ -6,10 +6,10 @@ import { useMutation } from "react-query";
 import styled from "styled-components";
 import { GrFormClose } from "react-icons/gr";
 
-import { login } from "../../lib/api";
 import loginState from "../../lib/recoil/auth";
 import birthday from "../../lib/recoil/user";
 
+import { login } from "../../lib/api";
 import config from "../../lib/config";
 import useModal from "../../lib/hooks/useModal";
 

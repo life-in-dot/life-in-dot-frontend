@@ -1,15 +1,15 @@
 import { selector } from "recoil";
 import birthdayState from "./atom";
 
-import calculateYears from "../../utils/calculateYears";
+import calHundredYearsData from "../../utils/calHundredYearsData";
 
 const yearsListState = selector({
   key: "yearsListState",
   get: ({ get }) => {
     const { year } = get(birthdayState);
-    const hundredYears = calculateYears(year);
+    const userHundredYearsData = calHundredYearsData(year);
 
-    return hundredYears;
+    return userHundredYearsData;
   },
   set: ({ set }, newBirthday) => set(birthdayState, newBirthday),
 });

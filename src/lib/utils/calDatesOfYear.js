@@ -14,11 +14,15 @@ const addOneDay = oneDay => {
 const calDatesOfNormalYear = (targetYear, birthMonth = 1, birthDate = 1) => {
   const datesOfYear = [];
 
-  const firstDayOfNextYear = `${targetYear + 1}-1-1`;
+  const firstDayOfNextYear = `${targetYear + 1}-${1}-${1}`;
   let oneDay = `${targetYear}-${birthMonth}-${birthDate}`;
 
   do {
-    datesOfYear.push(oneDay);
+    datesOfYear.push({
+      year: +oneDay.split("-")[0],
+      month: +oneDay.split("-")[1],
+      date: +oneDay.split("-")[2],
+    });
     oneDay = addOneDay(oneDay);
   } while (firstDayOfNextYear !== oneDay);
 
@@ -29,10 +33,14 @@ const calDatesOfLastYear = (targetYear, birthMonth, birthDate) => {
   const datesOfYear = [];
 
   const lastBirthday = `${targetYear}-${birthMonth}-${birthDate}`;
-  let oneDay = `${targetYear}-1-1`;
+  let oneDay = `${targetYear}-${1}-${1}`;
 
   do {
-    datesOfYear.push(oneDay);
+    datesOfYear.push({
+      year: +oneDay.split("-")[0],
+      month: +oneDay.split("-")[1],
+      date: +oneDay.split("-")[2],
+    });
     oneDay = addOneDay(oneDay);
   } while (lastBirthday !== oneDay);
 
@@ -40,6 +48,10 @@ const calDatesOfLastYear = (targetYear, birthMonth, birthDate) => {
 };
 
 export default function calDatesOfYear(userBirthday, targetYear) {
+  if (typeof targetYear !== "number") {
+    return null;
+  }
+
   const { year, month, date } = userBirthday;
 
   if (year === targetYear) {
