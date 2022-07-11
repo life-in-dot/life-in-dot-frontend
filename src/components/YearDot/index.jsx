@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 
 import * as d3 from "d3";
@@ -7,6 +8,7 @@ import styled from "styled-components";
 import { daysListState } from "../../lib/recoil/days";
 
 function YearDot() {
+  const navigate = useNavigate();
   const svgRef = useRef();
   const userOneYearData = useRecoilValue(daysListState);
 
@@ -18,13 +20,19 @@ function YearDot() {
       .select(svgRef.current)
       .append("svg")
       .attr("class", "year-board")
-      .attr("viewBox", [0, 0, width, height - 70]);
+      .attr("viewBox", [0, 0, width, height - 70])
+      .on("wheel", event => {
+        const zoomScale = svg._groups[0][0].__zoom.k;
+
+        if (zoomScale < 1) {
+          navigate("/life", { replace: false, state: "year" });
+        }
+      });
 
     const gDay = svg
       .append("g", "year-board")
       .attr("class", "day-dots")
       .attr("transform", `translate(${0},${0})`);
-
     const dayDots = gDay
       .selectAll("circle")
       .data(userOneYearData)
@@ -38,8 +46,6 @@ function YearDot() {
       .attr("stroke-width", 0.003)
       .attr("opacity", 0.5)
       .on("mouseover", event => {
-        const zoomScale = svg._groups[0][0].__zoom.k;
-        const targetDate = event.target.getAttribute("class");
         event.target.style.fill = "deeppink";
       })
       .on("mouseout", event => {

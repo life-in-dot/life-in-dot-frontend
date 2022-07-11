@@ -1,19 +1,21 @@
 import { useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 
 import * as d3 from "d3";
-import PropTypes from "prop-types";
 import styled from "styled-components";
 
 import { yearsListState } from "../../lib/recoil/user";
 import targetYearState from "../../lib/recoil/days";
+import dotCoordsState from "../../lib/recoil/coords";
 
 function LifeDot() {
   const navigate = useNavigate();
+  const location = useLocation();
   const svgRef = useRef();
   const userHundredYearsData = useRecoilValue(yearsListState);
   const setUserOneYearData = useSetRecoilState(targetYearState);
+  const [dotCoords, setDotCoords] = useRecoilState(dotCoordsState);
 
   useEffect(() => {
     const width = window.innerWidth / 2;
@@ -55,36 +57,51 @@ function LifeDot() {
         const zoomScale = svg._groups[0][0].__zoom.k;
         const targetYear = event.target.getAttribute("class");
 
-        if (zoomScale > 50000) {
+        if (zoomScale > 50000 && location.state !== "year") {
           setUserOneYearData(+targetYear);
-          navigate("/year", { replace: false, state: +targetYear });
+          navigate("/year", { replace: false });
         }
+
+        location.state = "";
       });
 
-    const zoomed = ({ transform }) => {
+    const zoom = d3
+      .zoom()
+      .extent([
+        [0, 0],
+        [width, height],
+      ])
+      .scaleExtent([0, Infinity]);
+
+    svg
+      .call(zoom.on("zoom", zoomed))
+      .call(
+        zoom.transform,
+        d3.zoomIdentity.translate(dotCoords.x, dotCoords.y).scale(dotCoords.k),
+      );
+
+    function zoomed({ transform }) {
+      if (transform.k > 0) {
+        setDotCoords({
+          x: dotCoords.x + transform.x,
+          y: dotCoords.y + transform.y,
+          k: dotCoords.k + transform.k,
+        });
+      } else {
+        setDotCoords({
+          x: dotCoords.x + transform.x,
+          y: dotCoords.y + transform.y,
+          k: dotCoords.k - transform.k,
+        });
+      }
+
       gLife.attr("transform", transform);
       gYear.attr("transform", transform);
-    };
-
-    svg.call(
-      d3
-        .zoom()
-        .extent([
-          [0, 0],
-          [width, height],
-        ])
-        .scaleExtent([0, Infinity])
-        .on("zoom", zoomed),
-    );
-  }, []);
+    }
+  }, [setDotCoords, setUserOneYearData]);
 
   return <Main ref={svgRef} style={{ overflow: "visible" }}></Main>;
 }
-
-LifeDot.propTypes = {
-  data: PropTypes.array,
-  yearData: PropTypes.array,
-};
 
 const Main = styled.div`
   background-color: rgba(189, 229, 236, 0.3);
