@@ -63,6 +63,14 @@ function LifeDot() {
         }
 
         location.state = "";
+      })
+      .on("mouseover", event => {
+        const targetYear = event.target.getAttribute("class");
+
+        event.target.style.stroke = "deeppink";
+      })
+      .on("mouseout", event => {
+        event.target.style.stroke = "#BDE5EC";
       });
 
     const zoom = d3

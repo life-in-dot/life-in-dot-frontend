@@ -1,16 +1,18 @@
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 
 import * as d3 from "d3";
 import styled from "styled-components";
 
 import { daysListState } from "../../lib/recoil/days";
+import sidebarState from "../../lib/recoil/sidebar";
 
 function YearDot() {
   const navigate = useNavigate();
   const svgRef = useRef();
   const userOneYearData = useRecoilValue(daysListState);
+  const [isSidebarOpen, setIsSidebarOpen] = useRecoilState(sidebarState);
 
   useEffect(() => {
     const width = window.innerWidth / 2;
@@ -41,16 +43,19 @@ function YearDot() {
       .attr("cx", (d, i) => width / 2 + d.y / 10)
       .attr("cy", (d, i) => height / 2 + d.x / 10)
       .attr("class", d => `${d.year}-${d.month}-${d.date}`)
-      .attr("fill", "#22BC5E")
-      .attr("stroke", "#BDE5EC")
+      .attr("fill", "#9AFFC1")
+      .attr("stroke", "#69C9BC")
       .attr("stroke-width", 0.003)
       .attr("opacity", 0.5)
       .on("mouseover", event => {
+        const targetDate = event.target.getAttribute("class");
+
         event.target.style.fill = "deeppink";
       })
       .on("mouseout", event => {
-        event.target.style.fill = "none";
-      });
+        event.target.style.fill = "#9AFFC1";
+      })
+      .on("click", () => setIsSidebarOpen(true));
 
     const zoomed = ({ transform }) => {
       gDay.attr("transform", transform);
@@ -66,7 +71,7 @@ function YearDot() {
         .scaleExtent([0, Infinity])
         .on("zoom", zoomed),
     );
-  }, [userOneYearData]);
+  }, [userOneYearData, isSidebarOpen]);
 
   return <Main ref={svgRef} style={{ overflow: "visible" }}></Main>;
 }
