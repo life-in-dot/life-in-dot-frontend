@@ -6,6 +6,7 @@ export default function calDatesData(datesOfTargetYear) {
 
   datesOfTargetYear.forEach(targetDate => {
     const { year, month, date } = targetDate;
+    const dateId = `${year}-${month}-${date}`;
 
     if (curMonth < month) {
       col++;
@@ -13,7 +14,15 @@ export default function calDatesData(datesOfTargetYear) {
       curMonth = month;
     }
 
-    oneYearData.push({ year, month, date, r: 0.1, x: row, y: col });
+    oneYearData.push({
+      dateId,
+      year,
+      month,
+      date,
+      r: 0.1,
+      x: row,
+      y: col,
+    });
 
     row++;
   });
