@@ -1,14 +1,75 @@
-import { useRecoilState } from "recoil";
+import { useState, useEffect } from "react";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { useMutation } from "react-query";
 
 import styled from "styled-components";
 import { IoIosMusicalNotes } from "react-icons/io";
 
+import loginState from "../../lib/recoil/auth";
 import sidebarState from "../../lib/recoil/sidebar";
+import journalIdState from "../../lib/recoil/currentJournal";
+import currentJournalDateIdState from "../../lib/recoil/currentJournalDateIdState";
+
+import { getJournal, updateJournal } from "../../lib/api";
 
 function RightSidebar() {
   const [isSidebarOpen, setIsSidebarOpen] = useRecoilState(sidebarState);
+  const [currentJournalId, setCurrentJournalId] =
+    useRecoilState(journalIdState);
+  const [currentJournalDateId, setCurrentJournalDateId] = useRecoilState(
+    currentJournalDateIdState,
+  );
+  const [journalData, setJournalData] = useState({});
+  const updateJournalMutation = useMutation(updateJournal);
+  const loginData = useRecoilValue(loginState);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const userId = loginData?.data._id;
+
+      try {
+        if (
+          isSidebarOpen &&
+          currentJournalId &&
+          currentJournalDateId &&
+          journalData
+        ) {
+          updateJournalMutation.mutate({
+            dateId: currentJournalDateId,
+            userId,
+            journalId: currentJournalId,
+            journal: {
+              title: journalData.title,
+              contents: journalData.contents,
+            },
+          });
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }, 2000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [isSidebarOpen, currentJournalId, currentJournalDateId, journalData]);
+
+  useEffect(() => {
+    (async () => {
+      const userId = loginData?.data._id;
+
+      if (isSidebarOpen && currentJournalId) {
+        const { data } = await getJournal(userId, currentJournalId);
+
+        setJournalData(data);
+        setCurrentJournalDateId(data.dateId);
+        setCurrentJournalId(data._id);
+      }
+    })();
+  }, [isSidebarOpen, currentJournalId]);
 
   const onClickHandler = () => setIsSidebarOpen(false);
+
   return (
     <Sidebar sidebar={isSidebarOpen}>
       <AlbumWrapper onClick={onClickHandler}>
@@ -21,9 +82,9 @@ function RightSidebar() {
         <JournalTitle
           name="journal-title"
           placeholder="Write your title."
-          defaultValue={"data.title"}
+          defaultValue={journalData.title}
           onChange={e => {
-            setArticleData(data => {
+            setJournalData(data => {
               data.title = e.target.value;
               return data;
             });
@@ -32,10 +93,10 @@ function RightSidebar() {
         <JournalContents
           name="journal-contents"
           placeholder="Write your day."
-          defaultValue={"data.contents"}
+          defaultValue={journalData.contents}
           onChange={e => {
-            setArticleData(data => {
-              data.title = e.target.value;
+            setJournalData(data => {
+              data.contents = e.target.value;
               return data;
             });
           }}
@@ -54,7 +115,7 @@ const Sidebar = styled.div`
   overflow: hidden scroll;
   overflow-y: scroll;
   flex-direction: column;
-  background-color: #22bc5e;
+  background-color: #9affc1;
   opacity: 0.7;
   transition: all 200ms ease-in 0s;
   box-shadow: 0 6px 10px 0 rgb(0 0 0 / 8%), 0 0 2px 0 rgb(34 188 94 / 15%);
