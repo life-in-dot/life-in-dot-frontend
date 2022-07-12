@@ -57,7 +57,7 @@ function Login() {
   return (
     <Wrapper>
       <CloseButton onClick={hideModal} />
-      <LogoImage src="/life-in-dot.-favicon.png"></LogoImage>
+      <LogoImage src="/assets/life-in-dot.-favicon.png"></LogoImage>
       <div id="google-login"></div>
     </Wrapper>
   );
