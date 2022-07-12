@@ -35,10 +35,10 @@ function LifeDot() {
       .attr("r", d => d)
       .attr("cx", (d, i) => width / 2)
       .attr("cy", (d, i) => height / 2)
-      .attr("fill", "#22BC5E")
-      .attr("stroke", "#BDE5EC")
+      .attr("fill", "#9AFFC1")
+      .attr("stroke", "#69C9BC")
       .attr("stroke-width", 3)
-      .attr("opacity", 0.3);
+      .attr("opacity", 0.2);
 
     const gYear = svg.append("g", "life-board").attr("class", "year-dots");
     gYear
@@ -46,12 +46,12 @@ function LifeDot() {
       .data(userHundredYearsData)
       .join("circle")
       .attr("r", d => d.r / 10)
-      .attr("cx", (d, i) => width / 2 + d.y / 10)
-      .attr("cy", (d, i) => height / 2 + d.x / 10)
+      .attr("cx", (d, i) => width / 2 + d.y / 10 - 0.5)
+      .attr("cy", (d, i) => height / 2 + d.x / 10 - 0.5)
       .attr("class", d => `${d.year}`)
-      .attr("fill", "#22BC5E")
-      .attr("stroke", "#BDE5EC")
-      .attr("stroke-width", 0.003)
+      .attr("fill", "#9AFFC1")
+      .attr("stroke", "#69C9BC")
+      .attr("stroke-width", 0.002)
       .attr("opacity", 0.5)
       .on("wheel", event => {
         const zoomScale = svg._groups[0][0].__zoom.k;
@@ -70,7 +70,7 @@ function LifeDot() {
         event.target.style.stroke = "deeppink";
       })
       .on("mouseout", event => {
-        event.target.style.stroke = "#BDE5EC";
+        event.target.style.stroke = "#69C9BC";
       });
 
     const zoom = d3
@@ -112,7 +112,6 @@ function LifeDot() {
 }
 
 const Main = styled.div`
-  background-color: rgba(189, 229, 236, 0.3);
   height: 100%;
   width: 100%;
 `;

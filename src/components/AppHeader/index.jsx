@@ -8,7 +8,7 @@ function AppHeader() {
       <InnerHeader>
         <Link to={"/"}>
           <Brand>
-            <BrandImage src="/life-in-dot.-favicon.png" />
+            <BrandImage src="/assets/life-in-dot.-favicon.png" />
             <BrandTitle>life in dot.</BrandTitle>
           </Brand>
         </Link>
