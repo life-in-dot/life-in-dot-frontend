@@ -23,3 +23,31 @@ export const getJournalList = async userId => {
 
   return data;
 };
+
+export const getJournal = async (userId, journalId) => {
+  const { data } = await API.get(`/api/users/${userId}/journals/${journalId}`);
+
+  return data;
+};
+
+export const createJournal = async (userId, journal) => {
+  const { data } = await API.post(`/api/users/${userId}/journals/`, {
+    ...journal,
+  });
+
+  return data;
+};
+
+export const updateJournal = ({ userId, journalId, dateId, journal }) =>
+  API.put(`/api/users/${userId}/journals/${journalId}`, {
+    dateId,
+    ...journal,
+  });
+
+export const replaceJournal = (userId, journalId, journal) =>
+  API.put(`/api/users/${userId}/journals/${journalId}`, {
+    ...journal,
+  });
+
+export const deleteJournal = (userId, journalId) =>
+  API.put(`/api/users/${userId}/journals/${journalId}`);
