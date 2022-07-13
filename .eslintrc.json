@@ -31,7 +31,9 @@
     "no-use-before-define": "off",
     "no-param-reassign": "off",
     "no-continue": "off",
-    "array-callback-return": "off"
+    "array-callback-return": "off",
+    "import/no-extraneous-dependencies": "off",
+    "consistent-return": "off"
   },
   "settings": {
     "import/resolver": {

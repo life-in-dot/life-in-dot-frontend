@@ -4,6 +4,8 @@ import modalState from "../../lib/recoil/modal";
 
 import Modal from "../Modal";
 import Login from "../Login";
+import SaveMusicModal from "../SaveMusicModal";
+import DeleteJournalModal from "../DeleteJournalModal";
 
 function GlobalModal() {
   const { modalType, modalProps } = useRecoilValue(modalState) || {};
@@ -13,6 +15,18 @@ function GlobalModal() {
       return (
         <Modal>
           <Login />
+        </Modal>
+      );
+    case "SaveMusicModal":
+      return (
+        <Modal>
+          <SaveMusicModal />
+        </Modal>
+      );
+    case "DeleteJournalModal":
+      return (
+        <Modal>
+          <DeleteJournalModal />
         </Modal>
       );
   }
