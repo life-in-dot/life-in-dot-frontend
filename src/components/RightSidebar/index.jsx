@@ -1,16 +1,20 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { useMutation } from "react-query";
 
 import styled from "styled-components";
+import { GrFormClose } from "react-icons/gr";
+import { AiOutlineMenuUnfold } from "react-icons/ai";
 import { IoIosMusicalNotes } from "react-icons/io";
 
 import loginState from "../../lib/recoil/auth";
 import sidebarState from "../../lib/recoil/sidebar";
 import journalIdState from "../../lib/recoil/currentJournal";
 import currentJournalDateIdState from "../../lib/recoil/currentJournalDateIdState";
+import currentMusicIdState from "../../lib/recoil/currentMusic";
 
 import { getJournal, updateJournal } from "../../lib/api";
+import useModal from "../../lib/hooks/useModal";
 
 function RightSidebar() {
   const [isSidebarOpen, setIsSidebarOpen] = useRecoilState(sidebarState);
@@ -19,14 +23,16 @@ function RightSidebar() {
   const [currentJournalDateId, setCurrentJournalDateId] = useRecoilState(
     currentJournalDateIdState,
   );
+  const [currentMusicId, setCurrentMusicId] =
+    useRecoilState(currentMusicIdState);
   const [journalData, setJournalData] = useState({});
   const updateJournalMutation = useMutation(updateJournal);
   const loginData = useRecoilValue(loginState);
+  const { showModal } = useModal();
 
   useEffect(() => {
     const interval = setInterval(() => {
       const userId = loginData?.data._id;
-
       try {
         if (
           isSidebarOpen &&
@@ -41,18 +47,19 @@ function RightSidebar() {
             journal: {
               title: journalData.title,
               contents: journalData.contents,
+              contentsSize: journalData.contents?.length,
             },
           });
         }
       } catch (error) {
         console.error(error);
       }
-    }, 2000);
+    }, 5000);
 
     return () => {
       clearInterval(interval);
     };
-  }, [isSidebarOpen, currentJournalId, currentJournalDateId, journalData]);
+  }, [isSidebarOpen, currentJournalId, currentJournalDateId]);
 
   useEffect(() => {
     (async () => {
@@ -68,17 +75,57 @@ function RightSidebar() {
     })();
   }, [isSidebarOpen, currentJournalId]);
 
-  const onClickHandler = () => setIsSidebarOpen(false);
+  const onMusicClickHandler = e => {
+    e.stopPropagation();
+
+    showModal({
+      modalType: "SaveMusicModal",
+    });
+  };
+
+  const onCloseClickHandler = e => {
+    e.stopPropagation();
+
+    setIsSidebarOpen(false);
+    setCurrentJournalId("");
+    setCurrentMusicId("");
+    setJournalData({});
+  };
+
+  const onDeleteClickHandler = () => {
+    showModal({
+      modalType: "DeleteJournalModal",
+    });
+  };
 
   return (
     <Sidebar sidebar={isSidebarOpen}>
-      <AlbumWrapper onClick={onClickHandler}>
-        <AlbumCoverWrapper>
-          <AlbumCover></AlbumCover>
-          <MusicIcon />
-        </AlbumCoverWrapper>
-      </AlbumWrapper>
+      <MusicWrapper onClick={onMusicClickHandler}>
+        <CloseButton onClick={onCloseClickHandler} />
+        <MusicCoverWrapper>
+          {isSidebarOpen && (
+            <>
+              {currentMusicId ? (
+                <MusicCover>
+                  <iframe
+                    className="iframe-player"
+                    width="560"
+                    height="300"
+                    src={`https://www.youtube.com/embed/${journalData.musicUrl}?controls=0&fs=0&rel=0&autoplay=1&loop=100`}
+                    title="YouTube video player"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  ></iframe>
+                </MusicCover>
+              ) : (
+                <MusicIcon />
+              )}
+            </>
+          )}
+        </MusicCoverWrapper>
+      </MusicWrapper>
       <JournalWrapper>
+        <DeleteButton onClick={onDeleteClickHandler} />
         <JournalTitle
           name="journal-title"
           placeholder="Write your title."
@@ -121,16 +168,17 @@ const Sidebar = styled.div`
   box-shadow: 0 6px 10px 0 rgb(0 0 0 / 8%), 0 0 2px 0 rgb(34 188 94 / 15%);
 `;
 
-const AlbumWrapper = styled.div`
+const MusicWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 40%;
+  height: 60%;
   width: 100%;
+  cursor: help;
 `;
 
-const AlbumCoverWrapper = styled.div`
+const MusicCoverWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -141,7 +189,11 @@ const AlbumCoverWrapper = styled.div`
   box-shadow: 0 6px 10px 0 rgb(0 0 0 / 8%), 0 0 2px 0 rgb(34 188 94 / 15%);
 `;
 
-const AlbumCover = styled.img``;
+const MusicCover = styled.div`
+  .iframe-player {
+    pointer-events: none;
+  }
+`;
 
 const MusicIcon = styled(IoIosMusicalNotes)`
   height: 30px;
@@ -153,7 +205,7 @@ const JournalWrapper = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 60%;
+  height: 100%;
   width: 100%;
   transition: all 200ms ease-in 0s;
   box-shadow: 0 6px 10px 0 rgb(0 0 0 / 8%), 0 0 2px 0 rgb(34 188 94 / 15%);
@@ -181,6 +233,31 @@ const JournalContents = styled.textarea`
   outline: none;
   resize: none;
   overflow-y: scroll;
+`;
+
+const CloseButton = styled(AiOutlineMenuUnfold)`
+  position: absolute;
+  top: 3%;
+  left: 3%;
+  background-color: white;
+  box-shadow: 0 2px 5px 1px rgb(64 60 67 / 16%);
+  border-radius: 10px;
+  height: 30px;
+  width: 30px;
+  cursor: pointer;
+`;
+
+const DeleteButton = styled(GrFormClose)`
+  position: absolute;
+  top: 40%;
+  left: 88%;
+  background-color: white;
+  box-shadow: 0 2px 5px 1px rgb(64 60 67 / 16%);
+  opacity: 0.7;
+  border-radius: 10px;
+  height: 30px;
+  width: 30px;
+  cursor: pointer;
 `;
 
 export default RightSidebar;

@@ -15,6 +15,7 @@ import currentJournalDateIdState from "../../lib/recoil/currentJournalDateIdStat
 
 import { getJournalList, createJournal } from "../../lib/api";
 import insertDataByDateId from "../../lib/utils/insertDataByDateId";
+import currentMusicIdState from "../../lib/recoil/currentMusic";
 
 function YearDot() {
   const navigate = useNavigate();
@@ -25,6 +26,7 @@ function YearDot() {
   const setIsSidebarOpen = useSetRecoilState(sidebarState);
   const setCurrentJournalId = useSetRecoilState(currentJournalIdState);
   const setCurrentJournalDateId = useSetRecoilState(currentJournalDateIdState);
+  const setCurrentMusicId = useSetRecoilState(currentMusicIdState);
   const loginData = useRecoilValue(loginState);
   const userId = loginData.data._id;
 
@@ -71,6 +73,7 @@ function YearDot() {
       .attr("cy", (d, i) => height / 2 + d.x / 10)
       .attr("id", d => d.dateId)
       .attr("journalId", d => d.journalId)
+      .attr("musicUrl", d => d.musicUrl)
       .attr("fill", d => (d.journalId ? "deeppink" : "#9AFFC1"))
       .attr("stroke", "#69C9BC")
       .attr("stroke-width", 0.003)
@@ -93,6 +96,7 @@ function YearDot() {
       .on("click", event => {
         const targetDate = event.target.getAttribute("id");
         const journalId = event.target.getAttribute("journalId");
+        const musicUrl = event.target.getAttribute("musicUrl");
         event.target.style.fill = "deeppink";
 
         if (journalId) {
@@ -114,6 +118,9 @@ function YearDot() {
             setIsSidebarOpen(true);
           })();
         }
+        if (musicUrl) {
+          setCurrentMusicId(musicUrl);
+        }
       });
 
     const zoomed = ({ transform }) => {
@@ -130,7 +137,7 @@ function YearDot() {
         .scaleExtent([0, Infinity])
         .on("zoom", zoomed),
     );
-  }, []);
+  }, [userOneYearContents]);
 
   return (
     <>
