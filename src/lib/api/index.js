@@ -39,15 +39,16 @@ export const createJournal = async (userId, journal) => {
 };
 
 export const updateJournal = ({ userId, journalId, dateId, journal }) =>
+  API.patch(`/api/users/${userId}/journals/${journalId}`, {
+    dateId,
+    ...journal,
+  });
+
+export const replaceJournal = (userId, journalId, dateId, journal) =>
   API.put(`/api/users/${userId}/journals/${journalId}`, {
     dateId,
     ...journal,
   });
 
-export const replaceJournal = (userId, journalId, journal) =>
-  API.put(`/api/users/${userId}/journals/${journalId}`, {
-    ...journal,
-  });
-
-export const deleteJournal = (userId, journalId) =>
-  API.put(`/api/users/${userId}/journals/${journalId}`);
+export const deleteJournal = ({ userId, journalId }) =>
+  API.delete(`/api/users/${userId}/journals/${journalId}`);
