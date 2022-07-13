@@ -7,12 +7,17 @@ export default function insertDataByDateId(dataArray, targetArray) {
     copiedTargetArray.push(copiedObj);
   }
 
+  if (!dataArray.length) {
+    return copiedTargetArray;
+  }
+
   const targetDataArray = dataArray.map((dataObj, i, array) => {
-    const { dateId, _id } = dataObj;
+    const { dateId, _id, musicUrl } = dataObj;
 
     for (let i = 0; i < copiedTargetArray.length; i++) {
       if (dateId === copiedTargetArray[i].dateId) {
         copiedTargetArray[i].journalId = _id;
+        copiedTargetArray[i].musicUrl = musicUrl;
       }
     }
 
