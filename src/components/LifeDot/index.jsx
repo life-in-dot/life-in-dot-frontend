@@ -1,23 +1,27 @@
-import { useEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 
 import * as d3 from "d3";
 import styled from "styled-components";
 
-import { yearsListState } from "../../lib/recoil/user";
+import birthday, { yearsListState } from "../../lib/recoil/user";
 import targetYearState from "../../lib/recoil/days";
 import dotCoordsState from "../../lib/recoil/coords";
+
+import { makeRadialGradient } from "../../lib/utils/makeGradientColors";
+import createTooltip from "../../lib/utils/createTooltip";
 
 function LifeDot() {
   const navigate = useNavigate();
   const location = useLocation();
-  const svgRef = useRef();
+  const svgRef = useRef(null);
+  const dateOfBirth = useRecoilValue(birthday);
   const userHundredYearsData = useRecoilValue(yearsListState);
   const setUserOneYearData = useSetRecoilState(targetYearState);
   const [dotCoords, setDotCoords] = useRecoilState(dotCoordsState);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const width = window.innerWidth / 2;
     const height = window.innerHeight / 2;
 
@@ -25,7 +29,14 @@ function LifeDot() {
       .select(svgRef.current)
       .append("svg")
       .attr("class", "life-board")
+      .attr("height", "100%")
+      .attr("width", "100%")
       .attr("viewBox", [0, 0, width, height]);
+
+    const radialGradient = makeRadialGradient(svg, "normal");
+    radialGradient.attr("id", "radial-gradient");
+
+    const tooltip = createTooltip("#main-svg", 70);
 
     const gLife = svg.append("g", "life-board").attr("class", "life-dot");
     gLife
@@ -33,12 +44,17 @@ function LifeDot() {
       .data([10])
       .join("circle")
       .attr("r", d => d)
-      .attr("cx", (d, i) => width / 2)
-      .attr("cy", (d, i) => height / 2)
-      .attr("fill", "#9AFFC1")
-      .attr("stroke", "#69C9BC")
-      .attr("stroke-width", 3)
-      .attr("opacity", 0.2);
+      .attr("cx", d => width / 2)
+      .attr("cy", d => height / 2)
+      .attr("fill", "url(#radial-gradient)")
+      .attr("opacity", 0.7)
+      .attr("box-shadow", "0 2px 5px 1px rgb(64 60 67 / 16%)")
+      .append("animate")
+      .attr("id", "animate-dots")
+      .attr("attributeName", "r")
+      .attr("values", "5;145;5")
+      .attr("dur", "90s")
+      .attr("repeatCount", "indefinite");
 
     const gYear = svg.append("g", "life-board").attr("class", "year-dots");
     gYear
@@ -46,16 +62,16 @@ function LifeDot() {
       .data(userHundredYearsData)
       .join("circle")
       .attr("r", d => d.r / 10)
-      .attr("cx", (d, i) => width / 2 + d.y / 10 - 0.5)
-      .attr("cy", (d, i) => height / 2 + d.x / 10 - 0.5)
-      .attr("class", d => `${d.year}`)
-      .attr("fill", "#9AFFC1")
-      .attr("stroke", "#69C9BC")
-      .attr("stroke-width", 0.002)
-      .attr("opacity", 0.5)
-      .on("wheel", event => {
+      .attr("cx", d => width / 2 + d.y / 10 - 0.5)
+      .attr("cy", d => height / 2 + d.x / 10 - 0.5)
+      .attr("id", d => `${d.year}`)
+      .attr("class", "year-dot")
+      .attr("opacity", 0.7)
+      .attr("fill", "url(#radial-gradient)")
+      .attr("box-shadow", "0 2px 5px 1px rgb(64 60 67 / 16%)")
+      .on("wheel", e => {
         const zoomScale = svg._groups[0][0].__zoom.k;
-        const targetYear = event.target.getAttribute("class");
+        const targetYear = e.target.getAttribute("id");
 
         if (zoomScale > 50000 && location.state !== "year") {
           setUserOneYearData(+targetYear);
@@ -64,14 +80,17 @@ function LifeDot() {
 
         location.state = "";
       })
-      .on("mouseover", event => {
-        const targetYear = event.target.getAttribute("class");
-
-        event.target.style.stroke = "deeppink";
-      })
-      .on("mouseout", event => {
-        event.target.style.stroke = "#69C9BC";
-      });
+      .on("mouseover", (e, d) =>
+        tooltip
+          .style("visibility", "visible")
+          .text(`It's ${d.year}, you're ${d.year - dateOfBirth.year + 1}`),
+      )
+      .on("mousemove", e =>
+        tooltip
+          .style("top", `${e.clientY - 60}px`)
+          .style("left", `${e.clientX - 50}px`),
+      )
+      .on("mouseout", e => tooltip.style("visibility", "hidden"));
 
     const zoom = d3
       .zoom()
@@ -106,10 +125,23 @@ function LifeDot() {
       gLife.attr("transform", transform);
       gYear.attr("transform", transform);
     }
+
+    return () => {
+      svgRef.current = null;
+    };
   }, [setDotCoords, setUserOneYearData]);
 
-  return <Main ref={svgRef} style={{ overflow: "visible" }}></Main>;
+  return (
+    <MainWrapper id="main-svg">
+      <Main ref={svgRef} style={{ overflow: "visible" }}></Main>
+    </MainWrapper>
+  );
 }
+
+const MainWrapper = styled.div`
+  height: 100%;
+  width: 100%;
+`;
 
 const Main = styled.div`
   height: 100%;
