@@ -1,7 +1,7 @@
-import { useEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import { useQuery } from "react-query";
+import { useQuery, useMutation, useQueryClient } from "react-query";
 
 import * as d3 from "d3";
 import styled from "styled-components";
@@ -12,14 +12,17 @@ import yearDataState from "../../lib/recoil/yearData";
 import sidebarState from "../../lib/recoil/sidebar";
 import currentJournalIdState from "../../lib/recoil/currentJournal";
 import currentJournalDateIdState from "../../lib/recoil/currentJournalDateIdState";
+import currentMusicIdState from "../../lib/recoil/currentMusic";
 
 import { getJournalList, createJournal } from "../../lib/api";
 import insertDataByDateId from "../../lib/utils/insertDataByDateId";
-import currentMusicIdState from "../../lib/recoil/currentMusic";
+import { makeRadialGradient } from "../../lib/utils/makeGradientColors";
+import createTooltip from "../../lib/utils/createTooltip";
 
 function YearDot() {
   const navigate = useNavigate();
   const svgRef = useRef();
+  const queryClient = useQueryClient();
   const userOneYearData = useRecoilValue(daysListState);
   const [userOneYearContents, setUserOneYearContents] =
     useRecoilState(yearDataState);
@@ -27,6 +30,7 @@ function YearDot() {
   const setCurrentJournalId = useSetRecoilState(currentJournalIdState);
   const setCurrentJournalDateId = useSetRecoilState(currentJournalDateIdState);
   const setCurrentMusicId = useSetRecoilState(currentMusicIdState);
+  const createJournalMutation = useMutation(createJournal);
   const loginData = useRecoilValue(loginState);
   const userId = loginData.data._id;
 
@@ -35,12 +39,13 @@ function YearDot() {
     () => getJournalList(userId),
     {
       select: response => response.data,
-      onSuccess: data =>
-        setUserOneYearContents(insertDataByDateId(data, userOneYearData)),
+      onSuccess: data => {
+        setUserOneYearContents(insertDataByDateId(data, userOneYearData));
+      },
     },
   );
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const width = window.innerWidth / 2;
     const height = window.innerHeight / 2;
 
@@ -50,14 +55,27 @@ function YearDot() {
       .attr("class", "year-board")
       .attr("height", "100%")
       .attr("width", "100%")
-      .attr("viewBox", [0, 0, width, height - 70])
-      .on("wheel", event => {
+      .attr("viewBox", [0, 0, width / 2, height / 2 - 70])
+      .on("wheel", () => {
         const zoomScale = svg._groups[0][0].__zoom.k;
 
         if (zoomScale < 1) {
           navigate("/life", { replace: false, state: "year" });
         }
       });
+
+    const radialGradient = makeRadialGradient(svg, "normal");
+    radialGradient.attr("id", "radial-gradient");
+
+    const radialDataGradient = makeRadialGradient(svg, "data");
+    radialDataGradient.attr("id", "radial-data-gradient");
+
+    const tooltip = createTooltip("#main-svg", 90);
+
+    const min = d3.min(data, d => d.contentsSize);
+    const max = d3.max(data, d => d.contentsSize);
+
+    const rScale = d3.scaleLinear().domain([min, max]).range([0.01, 0.04]);
 
     const gDay = svg
       .append("g", "year-board")
@@ -68,36 +86,34 @@ function YearDot() {
       .selectAll("circle")
       .data(userOneYearContents)
       .join("circle")
-      .attr("r", d => d.r / 10)
-      .attr("cx", (d, i) => width / 2 + d.y / 10)
-      .attr("cy", (d, i) => height / 2 + d.x / 10)
+      .attr("r", d => (d.contentsSize ? rScale(d.contentsSize) : d.r * 5))
+      .attr("cx", d => width / 5 + d.y * 4)
+      .attr("cy", d => height / 12 + d.x * 4)
       .attr("id", d => d.dateId)
       .attr("journalId", d => d.journalId)
       .attr("musicUrl", d => d.musicUrl)
-      .attr("fill", d => (d.journalId ? "deeppink" : "#9AFFC1"))
-      .attr("stroke", "#69C9BC")
-      .attr("stroke-width", 0.003)
+      .attr("fill", d =>
+        d.journalId ? "url(#radial-data-gradient)" : "url(#radial-gradient)",
+      )
       .attr("opacity", 0.5)
-      .on("mouseover", event => {
-        const targetDate = event.target.getAttribute("id");
-        const journalId = event.target.getAttribute("journalId");
+      .attr("cursor", "pointer")
+      .on("mouseover", (e, d) => {
+        const targetDate = e.target.getAttribute("id");
+        const journalId = e.target.getAttribute("journalId");
+        const musicUrl = e.target.getAttribute("musicUrl");
 
-        event.target.style.fill = "deeppink";
+        tooltip.style("visibility", "visible").text(`${d.dateId}`);
       })
-      .on("mouseout", event => {
-        const journalId = event.target.getAttribute("journalId");
-
-        if (journalId) {
-          event.target.style.fill = "deeppink";
-        } else {
-          event.target.style.fill = "#9AFFC1";
-        }
-      })
-      .on("click", event => {
-        const targetDate = event.target.getAttribute("id");
-        const journalId = event.target.getAttribute("journalId");
-        const musicUrl = event.target.getAttribute("musicUrl");
-        event.target.style.fill = "deeppink";
+      .on("mousemove", e =>
+        tooltip
+          .style("top", `${e.clientY - 60}px`)
+          .style("left", `${e.clientX - 50}px`),
+      )
+      .on("mouseout", e => tooltip.style("visibility", "hidden"))
+      .on("click", e => {
+        const targetDate = e.target.getAttribute("id");
+        const journalId = e.target.getAttribute("journalId");
+        const musicUrl = e.target.getAttribute("musicUrl");
 
         if (journalId) {
           setCurrentJournalId(journalId);
@@ -111,13 +127,26 @@ function YearDot() {
               contents: "",
             };
 
-            const { data } = await createJournal(userId, defaultJournal);
+            createJournalMutation.mutate(
+              {
+                userId,
+                journalData: {
+                  ...defaultJournal,
+                },
+              },
+              {
+                onSuccess: ({ data }) => {
+                  setCurrentJournalId(data._id);
+                  setCurrentJournalDateId(targetDate);
+                  setIsSidebarOpen(true);
 
-            setCurrentJournalId(data._id);
-            setCurrentJournalDateId(targetDate);
-            setIsSidebarOpen(true);
+                  queryClient.invalidateQueries("getJournalList");
+                },
+              },
+            );
           })();
         }
+
         if (musicUrl) {
           setCurrentMusicId(musicUrl);
         }
@@ -137,19 +166,30 @@ function YearDot() {
         .scaleExtent([0, Infinity])
         .on("zoom", zoomed),
     );
+
+    return () => {
+      svgRef.current = null;
+    };
   }, [userOneYearContents]);
 
   return (
     <>
       {userOneYearContents && (
-        <Main ref={svgRef} style={{ overflow: "visible" }}></Main>
+        <MainWrapper id="main-svg">
+          <Main ref={svgRef} style={{ overflow: "visible" }}></Main>
+        </MainWrapper>
       )}
     </>
   );
 }
 
+const MainWrapper = styled.div`
+  height: 100%;
+  width: 100%;
+`;
+
 const Main = styled.div`
-  background-color: #9affc1;
+  background: radial-gradient(#ec8686, #9da3e9);
   opacity: 0.8;
   transition: background-color 1s ease 0s;
   height: 100%;
