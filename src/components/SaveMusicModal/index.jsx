@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useRecoilValue, useSetRecoilState, useRecoilState } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { useMutation } from "react-query";
 
 import styled from "styled-components";
@@ -38,7 +38,7 @@ function SaveMusicModal() {
         dateId: currentJournalDateId,
         userId,
         journalId: currentJournalId,
-        journal: {
+        journalData: {
           musicUrl,
         },
       },

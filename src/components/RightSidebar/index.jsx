@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { useMutation } from "react-query";
+import { useMutation, useQueryClient } from "react-query";
 
 import styled from "styled-components";
 import { GrFormClose } from "react-icons/gr";
@@ -17,6 +17,7 @@ import { getJournal, updateJournal } from "../../lib/api";
 import useModal from "../../lib/hooks/useModal";
 
 function RightSidebar() {
+  const queryClient = useQueryClient();
   const [isSidebarOpen, setIsSidebarOpen] = useRecoilState(sidebarState);
   const [currentJournalId, setCurrentJournalId] =
     useRecoilState(journalIdState);
@@ -40,16 +41,21 @@ function RightSidebar() {
           currentJournalDateId &&
           journalData
         ) {
-          updateJournalMutation.mutate({
-            dateId: currentJournalDateId,
-            userId,
-            journalId: currentJournalId,
-            journal: {
-              title: journalData.title,
-              contents: journalData.contents,
-              contentsSize: journalData.contents?.length,
+          delete journalData._id;
+
+          updateJournalMutation.mutate(
+            {
+              dateId: currentJournalDateId,
+              userId,
+              journalId: currentJournalId,
+              journalData,
             },
-          });
+            {
+              onSuccess: () => {
+                queryClient.invalidateQueries("getJournalList");
+              },
+            },
+          );
         }
       } catch (error) {
         console.error(error);
@@ -59,7 +65,7 @@ function RightSidebar() {
     return () => {
       clearInterval(interval);
     };
-  }, [isSidebarOpen, currentJournalId, currentJournalDateId]);
+  }, [isSidebarOpen, journalData, currentJournalId, currentJournalDateId]);
 
   useEffect(() => {
     (async () => {
@@ -162,8 +168,8 @@ const Sidebar = styled.div`
   overflow: hidden scroll;
   overflow-y: scroll;
   flex-direction: column;
-  background-color: #9affc1;
-  opacity: 0.7;
+  background: radial-gradient(#ec8686, #9da3e9);
+  opacity: 0.8;
   transition: all 200ms ease-in 0s;
   box-shadow: 0 6px 10px 0 rgb(0 0 0 / 8%), 0 0 2px 0 rgb(34 188 94 / 15%);
 `;
@@ -186,7 +192,7 @@ const MusicCoverWrapper = styled.div`
   height: 100%;
   width: 100%;
   transition: all 200ms ease-in 0s;
-  box-shadow: 0 6px 10px 0 rgb(0 0 0 / 8%), 0 0 2px 0 rgb(34 188 94 / 15%);
+  box-shadow: inset 0 6px 10px 0 rgb(0 0 0 / 8%), 0 0 2px 0 rgb(34 188 94 / 15%);
 `;
 
 const MusicCover = styled.div`
