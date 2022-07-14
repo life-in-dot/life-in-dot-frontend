@@ -1,8 +1,19 @@
 import { Link } from "react-router-dom";
 
 import styled from "styled-components";
+import { TbUserCircle } from "react-icons/tb";
+
+import useModal from "../../lib/hooks/useModal";
 
 function AppHeader() {
+  const { showModal } = useModal();
+
+  const handleProfileClick = () => {
+    showModal({
+      modalType: "ProfileModal",
+    });
+  };
+
   return (
     <Header>
       <InnerHeader>
@@ -12,7 +23,7 @@ function AppHeader() {
             <BrandTitle>life in dot.</BrandTitle>
           </Brand>
         </Link>
-        <div>User Image</div>
+        <UserImage onClick={handleProfileClick} />
       </InnerHeader>
     </Header>
   );
@@ -71,6 +82,14 @@ const BrandTitle = styled.div`
   font-size: 1.2em;
   font-family: Helvetica, sans-serif;
   font-weight: bold;
+`;
+
+const UserImage = styled(TbUserCircle)`
+  margin-right: 15px;
+  height: 30px;
+  width: 30px;
+  opacity: 0.8;
+  cursor: pointer;
 `;
 
 export default AppHeader;
