@@ -30,19 +30,20 @@ export const getJournal = async (userId, journalId) => {
   return data;
 };
 
-export const createJournal = async (userId, journal) => {
+export const createJournal = async ({ userId, journalData }) => {
   const { data } = await API.post(`/api/users/${userId}/journals/`, {
-    ...journal,
+    ...journalData,
   });
 
   return data;
 };
 
-export const updateJournal = ({ userId, journalId, dateId, journal }) =>
+export const updateJournal = ({ userId, journalId, dateId, journalData }) => {
   API.patch(`/api/users/${userId}/journals/${journalId}`, {
     dateId,
-    ...journal,
+    ...journalData,
   });
+};
 
 export const replaceJournal = (userId, journalId, dateId, journal) =>
   API.put(`/api/users/${userId}/journals/${journalId}`, {
