@@ -4,6 +4,7 @@ import modalState from "../../lib/recoil/modal";
 
 import Modal from "../Modal";
 import Login from "../Login";
+import Profile from "../Profile";
 import SaveMusicModal from "../SaveMusicModal";
 import DeleteJournalModal from "../DeleteJournalModal";
 
@@ -27,6 +28,12 @@ function GlobalModal() {
       return (
         <Modal>
           <DeleteJournalModal />
+        </Modal>
+      );
+    case "ProfileModal":
+      return (
+        <Modal>
+          <Profile />
         </Modal>
       );
   }
