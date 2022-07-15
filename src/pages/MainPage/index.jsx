@@ -2,7 +2,9 @@ import { useRecoilValue, useSetRecoilState } from "recoil";
 
 import styled from "styled-components";
 
-import birthdayState, { yearsListState } from "../../lib/recoil/user";
+import birthdayState, {
+  hundredyearsListState,
+} from "../../lib/recoil/userYears";
 
 import useInputs from "../../lib/hooks/useInputs";
 import useModal from "../../lib/hooks/useModal";
@@ -10,7 +12,7 @@ import calculateBirthday from "../../lib/utils/calculateBirthday";
 
 function MainPage() {
   const userBirthday = useRecoilValue(birthdayState);
-  const setUserHundredYearsData = useSetRecoilState(yearsListState);
+  const setUserHundredYearsData = useSetRecoilState(hundredyearsListState);
   const { year, month, date } = userBirthday;
   const [{ birthYear, birthMonth, birthDate }, onChange, reset] = useInputs({
     birthYear: year,

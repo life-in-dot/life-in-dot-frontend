@@ -1,11 +1,17 @@
+import { lazy, Suspense } from "react";
+
 import styled from "styled-components";
 
-import LifeDot from "../../components/LifeDot";
+import Loading from "../../components/Loading";
+
+const LifeDot = lazy(() => import("../../components/LifeDot"));
 
 function LifePage() {
   return (
     <Wrapper>
-      <LifeDot></LifeDot>
+      <Suspense fallback={<Loading />}>
+        <LifeDot></LifeDot>
+      </Suspense>
     </Wrapper>
   );
 }
