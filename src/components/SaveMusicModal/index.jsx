@@ -7,8 +7,8 @@ import { GrFormClose } from "react-icons/gr";
 
 import loginState from "../../lib/recoil/auth";
 import sidebarState from "../../lib/recoil/sidebar";
-import journalIdState from "../../lib/recoil/currentJournal";
-import currentJournalDateIdState from "../../lib/recoil/currentJournalDateIdState";
+import journalIdState from "../../lib/recoil/currentJournalId";
+import currentJournalDateIdState from "../../lib/recoil/currentJournalDateId";
 
 import { updateJournal } from "../../lib/api";
 import useModal from "../../lib/hooks/useModal";
@@ -21,7 +21,7 @@ function SaveMusicModal() {
   const currentJournalId = useRecoilValue(journalIdState);
   const updateJournalMutation = useMutation(updateJournal);
   const loginData = useRecoilValue(loginState);
-  const { hideModal } = useModal();
+  const { showModal, hideModal } = useModal();
 
   const handleSaveClick = () => {
     setWrongInputWarn(false);
@@ -45,7 +45,12 @@ function SaveMusicModal() {
       {
         onSuccess: () => {
           setIsSidebarOpen(false);
-          hideModal();
+          showModal({
+            modalType: "ConfirmModal",
+            modalProps: {
+              message: "저장되었습니다.",
+            },
+          });
         },
       },
     );
