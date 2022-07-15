@@ -9,8 +9,8 @@ import { IoIosMusicalNotes } from "react-icons/io";
 
 import loginState from "../../lib/recoil/auth";
 import sidebarState from "../../lib/recoil/sidebar";
-import journalIdState from "../../lib/recoil/currentJournal";
-import currentJournalDateIdState from "../../lib/recoil/currentJournalDateIdState";
+import journalIdState from "../../lib/recoil/currentJournalId";
+import currentJournalDateIdState from "../../lib/recoil/currentJournalDateId";
 import currentMusicIdState from "../../lib/recoil/currentMusic";
 
 import { getJournal, updateJournal } from "../../lib/api";
@@ -18,7 +18,6 @@ import useModal from "../../lib/hooks/useModal";
 
 function RightSidebar() {
   const queryClient = useQueryClient();
-  const [isSidebarOpen, setIsSidebarOpen] = useRecoilState(sidebarState);
   const [currentJournalId, setCurrentJournalId] =
     useRecoilState(journalIdState);
   const [currentJournalDateId, setCurrentJournalDateId] = useRecoilState(
@@ -27,6 +26,9 @@ function RightSidebar() {
   const [currentMusicId, setCurrentMusicId] =
     useRecoilState(currentMusicIdState);
   const [journalData, setJournalData] = useState({});
+  const [isSidebarOpen, setIsSidebarOpen] = useRecoilState(sidebarState);
+
+  const getJournalMutation = useMutation(getJournal);
   const updateJournalMutation = useMutation(updateJournal);
   const loginData = useRecoilValue(loginState);
   const { showModal } = useModal();
@@ -41,7 +43,9 @@ function RightSidebar() {
           currentJournalDateId &&
           journalData
         ) {
-          delete journalData._id;
+          if (journalData._id) {
+            delete journalData._id;
+          }
 
           updateJournalMutation.mutate(
             {
@@ -72,11 +76,19 @@ function RightSidebar() {
       const userId = loginData?.data._id;
 
       if (isSidebarOpen && currentJournalId) {
-        const { data } = await getJournal(userId, currentJournalId);
-
-        setJournalData(data);
-        setCurrentJournalDateId(data.dateId);
-        setCurrentJournalId(data._id);
+        getJournalMutation.mutate(
+          {
+            userId,
+            journalId: currentJournalId,
+          },
+          {
+            onSuccess: ({ data }) => {
+              setJournalData(data);
+              setCurrentJournalDateId(data.dateId);
+              setCurrentJournalId(data._id);
+            },
+          },
+        );
       }
     })();
   }, [isSidebarOpen, currentJournalId]);
@@ -99,6 +111,8 @@ function RightSidebar() {
   };
 
   const onDeleteClickHandler = () => {
+    setJournalData({});
+
     showModal({
       modalType: "DeleteJournalModal",
     });
@@ -136,12 +150,11 @@ function RightSidebar() {
           name="journal-title"
           placeholder="Write your title."
           defaultValue={journalData.title}
-          onChange={e => {
-            setJournalData(data => {
-              data.title = e.target.value;
-              return data;
-            });
-          }}
+          onChange={e =>
+            setJournalData({
+              title: e.target.value,
+            })
+          }
         />
         <JournalContents
           name="journal-contents"

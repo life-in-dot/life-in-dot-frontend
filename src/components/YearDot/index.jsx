@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { useQuery, useMutation, useQueryClient } from "react-query";
@@ -7,12 +7,13 @@ import * as d3 from "d3";
 import styled from "styled-components";
 
 import loginState from "../../lib/recoil/auth";
-import { daysListState } from "../../lib/recoil/days";
-import yearDataState from "../../lib/recoil/yearData";
 import sidebarState from "../../lib/recoil/sidebar";
-import currentJournalIdState from "../../lib/recoil/currentJournal";
-import currentJournalDateIdState from "../../lib/recoil/currentJournalDateIdState";
+import { targetYearDaysListState } from "../../lib/recoil/targetYear";
+import targetYearContentsListState from "../../lib/recoil/yearContents";
+import currentJournalIdState from "../../lib/recoil/currentJournalId";
+import currentJournalDateIdState from "../../lib/recoil/currentJournalDateId";
 import currentMusicIdState from "../../lib/recoil/currentMusic";
+import userJournalListState from "../../lib/recoil/userJournals";
 
 import { getJournalList, createJournal } from "../../lib/api";
 import insertDataByDateId from "../../lib/utils/insertDataByDateId";
@@ -23,29 +24,36 @@ function YearDot() {
   const navigate = useNavigate();
   const svgRef = useRef();
   const queryClient = useQueryClient();
-  const userOneYearData = useRecoilValue(daysListState);
-  const [userOneYearContents, setUserOneYearContents] =
-    useRecoilState(yearDataState);
-  const setIsSidebarOpen = useSetRecoilState(sidebarState);
+
+  const userTargetYearData = useRecoilValue(targetYearDaysListState);
+  const [userTargetYearContents, setUserTargetYearContents] = useRecoilState(
+    targetYearContentsListState,
+  );
+  const [userJournalList, setUserJournalList] =
+    useRecoilState(userJournalListState);
+
   const setCurrentJournalId = useSetRecoilState(currentJournalIdState);
   const setCurrentJournalDateId = useSetRecoilState(currentJournalDateIdState);
   const setCurrentMusicId = useSetRecoilState(currentMusicIdState);
+  const setIsSidebarOpen = useSetRecoilState(sidebarState);
+
   const createJournalMutation = useMutation(createJournal);
   const loginData = useRecoilValue(loginState);
   const userId = loginData.data._id;
 
   const { data } = useQuery(
     ["getJournalList", userId],
-    () => getJournalList(userId),
+    () => getJournalList({ userId }),
     {
       select: response => response.data,
       onSuccess: data => {
-        setUserOneYearContents(insertDataByDateId(data, userOneYearData));
+        setUserTargetYearContents(insertDataByDateId(data, userTargetYearData));
+        setUserJournalList(data);
       },
     },
   );
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const width = window.innerWidth / 2;
     const height = window.innerHeight / 2;
 
@@ -55,11 +63,11 @@ function YearDot() {
       .attr("class", "year-board")
       .attr("height", "100%")
       .attr("width", "100%")
-      .attr("viewBox", [0, 0, width / 2, height / 2 - 70])
-      .on("wheel", () => {
+      .attr("viewBox", [0, 0, width / 2, height / 2])
+      .on("wheel", e => {
         const zoomScale = svg._groups[0][0].__zoom.k;
 
-        if (zoomScale < 1) {
+        if (zoomScale < 1.2 && e.deltaY > 0) {
           navigate("/life", { replace: false, state: "year" });
         }
       });
@@ -72,9 +80,8 @@ function YearDot() {
 
     const tooltip = createTooltip("#main-svg", 90);
 
-    const min = d3.min(data, d => d.contentsSize);
-    const max = d3.max(data, d => d.contentsSize);
-
+    const min = d3.min(userJournalList, d => d.contentsSize);
+    const max = d3.max(userJournalList, d => d.contentsSize);
     const rScale = d3.scaleLinear().domain([min, max]).range([0.01, 0.04]);
 
     const gDay = svg
@@ -84,7 +91,7 @@ function YearDot() {
 
     const dayDots = gDay
       .selectAll("circle")
-      .data(userOneYearContents)
+      .data(userTargetYearContents)
       .join("circle")
       .attr("r", d => (d.contentsSize ? rScale(d.contentsSize) : d.r * 5))
       .attr("cx", d => width / 5 + d.y * 4)
@@ -114,6 +121,12 @@ function YearDot() {
         const targetDate = e.target.getAttribute("id");
         const journalId = e.target.getAttribute("journalId");
         const musicUrl = e.target.getAttribute("musicUrl");
+
+        e.target.style.fill = "url(#radial-data-gradient)";
+
+        if (musicUrl) {
+          setCurrentMusicId(musicUrl);
+        }
 
         if (journalId) {
           setCurrentJournalId(journalId);
@@ -146,10 +159,6 @@ function YearDot() {
             );
           })();
         }
-
-        if (musicUrl) {
-          setCurrentMusicId(musicUrl);
-        }
       });
 
     const zoomed = ({ transform }) => {
@@ -170,11 +179,11 @@ function YearDot() {
     return () => {
       svgRef.current = null;
     };
-  }, [userOneYearContents]);
+  }, [userTargetYearContents, userJournalList, data]);
 
   return (
     <>
-      {userOneYearContents && (
+      {userTargetYearContents && (
         <MainWrapper id="main-svg">
           <Main ref={svgRef} style={{ overflow: "visible" }}></Main>
         </MainWrapper>
