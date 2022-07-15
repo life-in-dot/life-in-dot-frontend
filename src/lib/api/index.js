@@ -18,13 +18,13 @@ API.interceptors.request.use(req => {
 
 export const login = userData => API.post("/api/login", userData);
 
-export const getJournalList = async userId => {
+export const getJournalList = async ({ userId }) => {
   const { data } = await API.get(`/api/users/${userId}/journals`);
 
   return data;
 };
 
-export const getJournal = async (userId, journalId) => {
+export const getJournal = async ({ userId, journalId }) => {
   const { data } = await API.get(`/api/users/${userId}/journals/${journalId}`);
 
   return data;

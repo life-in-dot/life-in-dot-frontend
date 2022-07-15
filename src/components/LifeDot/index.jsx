@@ -1,14 +1,22 @@
-import { useLayoutEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useMutation } from "react-query";
 
 import * as d3 from "d3";
 import styled from "styled-components";
 
-import birthday, { yearsListState } from "../../lib/recoil/user";
-import targetYearState from "../../lib/recoil/days";
+import loginState from "../../lib/recoil/auth";
+import birthday, { hundredyearsListState } from "../../lib/recoil/userYears";
+import targetYearState, {
+  targetYearDaysListState,
+} from "../../lib/recoil/targetYear";
+import targetYearContentsListState from "../../lib/recoil/yearContents";
+import userJournalListState from "../../lib/recoil/userJournals";
 import dotCoordsState from "../../lib/recoil/coords";
 
+import { getJournalList } from "../../lib/api";
+import insertDataByDateId from "../../lib/utils/insertDataByDateId";
 import { makeRadialGradient } from "../../lib/utils/makeGradientColors";
 import createTooltip from "../../lib/utils/createTooltip";
 
@@ -16,12 +24,40 @@ function LifeDot() {
   const navigate = useNavigate();
   const location = useLocation();
   const svgRef = useRef(null);
-  const dateOfBirth = useRecoilValue(birthday);
-  const userHundredYearsData = useRecoilValue(yearsListState);
-  const setUserOneYearData = useSetRecoilState(targetYearState);
+
+  const setUserTargetYear = useSetRecoilState(targetYearState);
+  const setUserTargetYearContents = useSetRecoilState(
+    targetYearContentsListState,
+  );
+  const setUserJournalList = useSetRecoilState(userJournalListState);
   const [dotCoords, setDotCoords] = useRecoilState(dotCoordsState);
 
-  useLayoutEffect(() => {
+  const userHundredYearsData = useRecoilValue(hundredyearsListState);
+  const userTargetYearData = useRecoilValue(targetYearDaysListState);
+  const dateOfBirth = useRecoilValue(birthday);
+  const loginData = useRecoilValue(loginState);
+  const userId = loginData.data._id;
+  const getJournalListMutation = useMutation(getJournalList);
+
+  useEffect(() => {
+    getJournalListMutation.mutate(
+      {
+        userId,
+      },
+      {
+        onSuccess: ({ data }) => {
+          setUserTargetYearContents(
+            insertDataByDateId(data, userTargetYearData),
+          );
+
+          setUserJournalList(data);
+        },
+      },
+    );
+  }, [userTargetYearData]);
+
+  useEffect(() => {
+    const FIRST_DOT_SIZE = 10;
     const width = window.innerWidth / 2;
     const height = window.innerHeight / 2;
 
@@ -41,7 +77,7 @@ function LifeDot() {
     const gLife = svg.append("g", "life-board").attr("class", "life-dot");
     gLife
       .selectAll("circle")
-      .data([10])
+      .data([FIRST_DOT_SIZE])
       .join("circle")
       .attr("r", d => d)
       .attr("cx", d => width / 2)
@@ -62,8 +98,8 @@ function LifeDot() {
       .data(userHundredYearsData)
       .join("circle")
       .attr("r", d => d.r / 10)
-      .attr("cx", d => width / 2 + d.y / 10 - 0.5)
-      .attr("cy", d => height / 2 + d.x / 10 - 0.5)
+      .attr("cx", d => width / 2 + d.y / 10 - d.r * 5)
+      .attr("cy", d => height / 2 + d.x / 10 - d.r * 5)
       .attr("id", d => `${d.year}`)
       .attr("class", "year-dot")
       .attr("opacity", 0.7)
@@ -73,8 +109,11 @@ function LifeDot() {
         const zoomScale = svg._groups[0][0].__zoom.k;
         const targetYear = e.target.getAttribute("id");
 
-        if (zoomScale > 50000 && location.state !== "year") {
-          setUserOneYearData(+targetYear);
+        if (zoomScale > 18000) {
+          setUserTargetYear(+targetYear);
+        }
+
+        if (zoomScale > 50000 && e.deltaY < 0 && location.state !== "year") {
           navigate("/year", { replace: false });
         }
 
@@ -100,14 +139,7 @@ function LifeDot() {
       ])
       .scaleExtent([0, Infinity]);
 
-    svg
-      .call(zoom.on("zoom", zoomed))
-      .call(
-        zoom.transform,
-        d3.zoomIdentity.translate(dotCoords.x, dotCoords.y).scale(dotCoords.k),
-      );
-
-    function zoomed({ transform }) {
+    const zoomed = ({ transform }) => {
       if (transform.k > 0) {
         setDotCoords({
           x: dotCoords.x + transform.x,
@@ -124,12 +156,19 @@ function LifeDot() {
 
       gLife.attr("transform", transform);
       gYear.attr("transform", transform);
-    }
+    };
+
+    svg
+      .call(zoom.on("zoom", zoomed))
+      .call(
+        zoom.transform,
+        d3.zoomIdentity.translate(dotCoords.x, dotCoords.y).scale(dotCoords.k),
+      );
 
     return () => {
       svgRef.current = null;
     };
-  }, [setDotCoords, setUserOneYearData]);
+  }, [setDotCoords]);
 
   return (
     <MainWrapper id="main-svg">
