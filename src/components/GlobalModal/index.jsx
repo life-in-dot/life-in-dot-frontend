@@ -36,6 +36,8 @@ function GlobalModal() {
           <Profile />
         </Modal>
       );
+    case "ConfirmModal":
+      return <Modal>{modalProps.message}</Modal>;
   }
 }
 
