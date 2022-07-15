@@ -1,21 +1,26 @@
+import { lazy, Suspense } from "react";
 import { useRecoilValue } from "recoil";
 
 import styled from "styled-components";
 
 import sidebarState from "../../lib/recoil/sidebar";
 
-import YearDot from "../../components/YearDot";
-import RightSidebar from "../../components/RightSidebar";
+import Loading from "../../components/Loading";
+
+const YearDot = lazy(() => import("../../components/YearDot"));
+const RightSidebar = lazy(() => import("../../components/RightSidebar"));
 
 function YearPage() {
   const isSidebarOpen = useRecoilValue(sidebarState);
 
   return (
     <Wrapper>
-      <SVGWrapper sidebar={isSidebarOpen}>
-        <YearDot></YearDot>
-      </SVGWrapper>
-      <RightSidebar></RightSidebar>
+      <Suspense fallback={<Loading />}>
+        <SVGWrapper sidebar={isSidebarOpen}>
+          <YearDot></YearDot>
+        </SVGWrapper>
+        <RightSidebar></RightSidebar>
+      </Suspense>
     </Wrapper>
   );
 }
