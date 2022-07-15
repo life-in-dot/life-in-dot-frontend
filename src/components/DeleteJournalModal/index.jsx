@@ -6,7 +6,7 @@ import { GrFormClose } from "react-icons/gr";
 
 import loginState from "../../lib/recoil/auth";
 import sidebarState from "../../lib/recoil/sidebar";
-import journalIdState from "../../lib/recoil/currentJournal";
+import journalIdState from "../../lib/recoil/currentJournalId";
 import currentMusicIdState from "../../lib/recoil/currentMusic";
 
 import { deleteJournal } from "../../lib/api";
