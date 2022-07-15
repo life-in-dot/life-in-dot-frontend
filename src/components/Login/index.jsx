@@ -7,7 +7,7 @@ import styled from "styled-components";
 import { GrFormClose } from "react-icons/gr";
 
 import loginState from "../../lib/recoil/auth";
-import birthday from "../../lib/recoil/user";
+import birthday from "../../lib/recoil/userYears";
 
 import { login } from "../../lib/api";
 import config from "../../lib/config";
