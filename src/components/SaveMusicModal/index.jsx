@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
-import { useMutation } from "react-query";
+import { useMutation, useQueryClient } from "react-query";
 
 import styled from "styled-components";
 import { GrFormClose } from "react-icons/gr";
@@ -14,14 +14,17 @@ import { updateJournal } from "../../lib/api";
 import useModal from "../../lib/hooks/useModal";
 
 function SaveMusicModal() {
+  const queryClient = useQueryClient();
+  const { showModal, hideModal } = useModal();
+
   const [musicUrlInput, setMusicUrlInput] = useState("");
   const [wrongInputWarn, setWrongInputWarn] = useState("");
-  const setIsSidebarOpen = useSetRecoilState(sidebarState);
-  const currentJournalDateId = useRecoilValue(currentJournalDateIdState);
-  const currentJournalId = useRecoilValue(journalIdState);
-  const updateJournalMutation = useMutation(updateJournal);
   const loginData = useRecoilValue(loginState);
-  const { showModal, hideModal } = useModal();
+  const currentJournalId = useRecoilValue(journalIdState);
+  const currentJournalDateId = useRecoilValue(currentJournalDateIdState);
+
+  const setIsSidebarOpen = useSetRecoilState(sidebarState);
+  const updateJournalMutation = useMutation(updateJournal);
 
   const handleSaveClick = () => {
     setWrongInputWarn(false);
@@ -51,6 +54,8 @@ function SaveMusicModal() {
               message: "저장되었습니다.",
             },
           });
+
+          queryClient.invalidateQueries("getJournalList");
         },
       },
     );
@@ -68,7 +73,7 @@ function SaveMusicModal() {
   return (
     <Wrapper>
       <CloseButton onClick={hideModal} />
-      <LogoImage src="/assets/life-in-dot.-favicon.png"></LogoImage>
+      <LogoImage src="/assets/life-in-dot.png"></LogoImage>
       {wrongInputWarn ? (
         <p>올바르지 않은 URL 입니다.</p>
       ) : (
