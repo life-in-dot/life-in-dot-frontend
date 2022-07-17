@@ -13,7 +13,7 @@ import targetYearState, {
 } from "../../lib/recoil/targetYear";
 import targetYearContentsListState from "../../lib/recoil/yearContents";
 import userJournalListState from "../../lib/recoil/userJournals";
-import dotCoordsState from "../../lib/recoil/coords";
+import lifeDotCoordsState from "../../lib/recoil/lifeDotCoords";
 
 import { getJournalList } from "../../lib/api";
 import insertDataByDateId from "../../lib/utils/insertDataByDateId";
@@ -25,18 +25,18 @@ function LifeDot() {
   const location = useLocation();
   const svgRef = useRef(null);
 
-  const setUserTargetYear = useSetRecoilState(targetYearState);
-  const setUserTargetYearContents = useSetRecoilState(
-    targetYearContentsListState,
-  );
-  const setUserJournalList = useSetRecoilState(userJournalListState);
-  const [dotCoords, setDotCoords] = useRecoilState(dotCoordsState);
-
   const userHundredYearsData = useRecoilValue(hundredyearsListState);
   const userTargetYearData = useRecoilValue(targetYearDaysListState);
   const dateOfBirth = useRecoilValue(birthday);
   const loginData = useRecoilValue(loginState);
   const userId = loginData.data._id;
+
+  const setUserTargetYear = useSetRecoilState(targetYearState);
+  const setUserTargetYearContents = useSetRecoilState(
+    targetYearContentsListState,
+  );
+  const setUserJournalList = useSetRecoilState(userJournalListState);
+  const [dotCoords, setDotCoords] = useRecoilState(lifeDotCoordsState);
   const getJournalListMutation = useMutation(getJournalList);
 
   useEffect(() => {
@@ -80,10 +80,10 @@ function LifeDot() {
       .data([FIRST_DOT_SIZE])
       .join("circle")
       .attr("r", d => d)
-      .attr("cx", d => width / 2)
-      .attr("cy", d => height / 2)
+      .attr("cx", () => width / 2)
+      .attr("cy", () => height / 2)
       .attr("fill", "url(#radial-gradient)")
-      .attr("opacity", 0.7)
+      .attr("opacity", 0.8)
       .attr("box-shadow", "0 2px 5px 1px rgb(64 60 67 / 16%)")
       .append("animate")
       .attr("id", "animate-dots")
@@ -129,7 +129,7 @@ function LifeDot() {
           .style("top", `${e.clientY - 60}px`)
           .style("left", `${e.clientX - 50}px`),
       )
-      .on("mouseout", e => tooltip.style("visibility", "hidden"));
+      .on("mouseout", () => tooltip.style("visibility", "hidden"));
 
     const zoom = d3
       .zoom()
@@ -140,19 +140,11 @@ function LifeDot() {
       .scaleExtent([0, Infinity]);
 
     const zoomed = ({ transform }) => {
-      if (transform.k > 0) {
-        setDotCoords({
-          x: dotCoords.x + transform.x,
-          y: dotCoords.y + transform.y,
-          k: dotCoords.k + transform.k,
-        });
-      } else {
-        setDotCoords({
-          x: dotCoords.x + transform.x,
-          y: dotCoords.y + transform.y,
-          k: dotCoords.k - transform.k,
-        });
-      }
+      setDotCoords({
+        x: transform.x,
+        y: transform.y,
+        k: transform.k,
+      });
 
       gLife.attr("transform", transform);
       gYear.attr("transform", transform);
@@ -168,7 +160,7 @@ function LifeDot() {
     return () => {
       svgRef.current = null;
     };
-  }, [setDotCoords]);
+  }, [userHundredYearsData, setDotCoords]);
 
   return (
     <MainWrapper id="main-svg">
@@ -185,6 +177,7 @@ const MainWrapper = styled.div`
 const Main = styled.div`
   height: 100%;
   width: 100%;
+  z-index: 99999;
 `;
 
 export default LifeDot;
