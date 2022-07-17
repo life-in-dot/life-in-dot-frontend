@@ -121,8 +121,7 @@ function YearDot() {
         const targetDate = e.target.getAttribute("id");
         const journalId = e.target.getAttribute("journalId");
         const musicUrl = e.target.getAttribute("musicUrl");
-
-        e.target.style.fill = "url(#radial-data-gradient)";
+        const [year, month, date] = targetDate.split("-");
 
         if (musicUrl) {
           setCurrentMusicId(musicUrl);
@@ -131,13 +130,15 @@ function YearDot() {
         if (journalId) {
           setCurrentJournalId(journalId);
           setCurrentJournalDateId(targetDate);
+          setCurrentMusicId(musicUrl);
           setIsSidebarOpen(true);
         } else {
           (async () => {
             const defaultJournal = {
               dateId: targetDate,
-              title: "오늘의 제목",
+              title: `오늘은 ${year}년 ${month}월 ${date}일`,
               contents: "",
+              musicUrl: "",
             };
 
             createJournalMutation.mutate(
@@ -151,6 +152,7 @@ function YearDot() {
                 onSuccess: ({ data }) => {
                   setCurrentJournalId(data._id);
                   setCurrentJournalDateId(targetDate);
+                  setCurrentMusicId(data.musicUrl);
                   setIsSidebarOpen(true);
 
                   queryClient.invalidateQueries("getJournalList");
