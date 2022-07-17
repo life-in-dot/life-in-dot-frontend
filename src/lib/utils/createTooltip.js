@@ -4,6 +4,7 @@ export default function createTooltip(id, width) {
   const tooltip = d3
     .select(`${id}`)
     .append("div")
+    .attr("id", "tooltip")
     .style("display", "block")
     .style("position", "absolute")
     .style("width", `${width}px`)
