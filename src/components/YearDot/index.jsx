@@ -10,10 +10,11 @@ import loginState from "../../lib/recoil/auth";
 import sidebarState from "../../lib/recoil/sidebar";
 import { targetYearDaysListState } from "../../lib/recoil/targetYear";
 import targetYearContentsListState from "../../lib/recoil/yearContents";
+import userJournalListState from "../../lib/recoil/userJournals";
 import currentJournalIdState from "../../lib/recoil/currentJournalId";
 import currentJournalDateIdState from "../../lib/recoil/currentJournalDateId";
 import currentMusicIdState from "../../lib/recoil/currentMusic";
-import userJournalListState from "../../lib/recoil/userJournals";
+import yearDotCoordsState from "../../lib/recoil/yearDotCoords";
 
 import { getJournalList, createJournal } from "../../lib/api";
 import insertDataByDateId from "../../lib/utils/insertDataByDateId";
@@ -22,24 +23,25 @@ import createTooltip from "../../lib/utils/createTooltip";
 
 function YearDot() {
   const navigate = useNavigate();
-  const svgRef = useRef();
   const queryClient = useQueryClient();
+  const svgRef = useRef();
 
   const userTargetYearData = useRecoilValue(targetYearDaysListState);
+  const loginData = useRecoilValue(loginState);
+  const userId = loginData.data._id;
+
   const [userTargetYearContents, setUserTargetYearContents] = useRecoilState(
     targetYearContentsListState,
   );
   const [userJournalList, setUserJournalList] =
     useRecoilState(userJournalListState);
 
+  const setIsSidebarOpen = useSetRecoilState(sidebarState);
   const setCurrentJournalId = useSetRecoilState(currentJournalIdState);
   const setCurrentJournalDateId = useSetRecoilState(currentJournalDateIdState);
   const setCurrentMusicId = useSetRecoilState(currentMusicIdState);
-  const setIsSidebarOpen = useSetRecoilState(sidebarState);
-
+  const [dotCoords, setDotCoords] = useRecoilState(yearDotCoordsState);
   const createJournalMutation = useMutation(createJournal);
-  const loginData = useRecoilValue(loginState);
-  const userId = loginData.data._id;
 
   const { data } = useQuery(
     ["getJournalList", userId],
@@ -54,8 +56,8 @@ function YearDot() {
   );
 
   useEffect(() => {
-    const width = window.innerWidth / 2;
-    const height = window.innerHeight / 2;
+    const viewWidth = window.innerWidth / 2;
+    const viewHeight = window.innerHeight / 2;
 
     const svg = d3
       .select(svgRef.current)
@@ -63,11 +65,13 @@ function YearDot() {
       .attr("class", "year-board")
       .attr("height", "100%")
       .attr("width", "100%")
-      .attr("viewBox", [0, 0, width / 2, height / 2])
+      .attr("viewBox", [0, 0, viewWidth / 2, viewHeight / 2])
       .on("wheel", e => {
         const zoomScale = svg._groups[0][0].__zoom.k;
 
         if (zoomScale < 1.2 && e.deltaY > 0) {
+          setIsSidebarOpen(false);
+
           navigate("/life", { replace: false, state: "year" });
         }
       });
@@ -78,11 +82,11 @@ function YearDot() {
     const radialDataGradient = makeRadialGradient(svg, "data");
     radialDataGradient.attr("id", "radial-data-gradient");
 
-    const tooltip = createTooltip("#main-svg", 90);
+    const tooltip = createTooltip("#main-svg-wrapper", 90);
 
     const min = d3.min(userJournalList, d => d.contentsSize);
     const max = d3.max(userJournalList, d => d.contentsSize);
-    const rScale = d3.scaleLinear().domain([min, max]).range([0.01, 0.04]);
+    const rScale = d3.scaleLinear().domain([min, max]).range([0.02, 0.04]);
 
     const gDay = svg
       .append("g", "year-board")
@@ -94,8 +98,8 @@ function YearDot() {
       .data(userTargetYearContents)
       .join("circle")
       .attr("r", d => (d.contentsSize ? rScale(d.contentsSize) : d.r * 5))
-      .attr("cx", d => width / 5 + d.y * 4)
-      .attr("cy", d => height / 12 + d.x * 4)
+      .attr("cx", d => viewWidth / 5 + d.y * 4)
+      .attr("cy", d => viewHeight / 12 + d.x * 4)
       .attr("id", d => d.dateId)
       .attr("journalId", d => d.journalId)
       .attr("musicUrl", d => d.musicUrl)
@@ -105,10 +109,6 @@ function YearDot() {
       .attr("opacity", 0.5)
       .attr("cursor", "pointer")
       .on("mouseover", (e, d) => {
-        const targetDate = e.target.getAttribute("id");
-        const journalId = e.target.getAttribute("journalId");
-        const musicUrl = e.target.getAttribute("musicUrl");
-
         tooltip.style("visibility", "visible").text(`${d.dateId}`);
       })
       .on("mousemove", e =>
@@ -161,31 +161,53 @@ function YearDot() {
         }
       });
 
+    const zoom = d3
+      .zoom()
+      .extent([
+        [0, 0],
+        [viewWidth, viewHeight],
+      ])
+      .scaleExtent([0, Infinity]);
+
     const zoomed = ({ transform }) => {
+      setDotCoords({
+        x: transform.x,
+        y: transform.y,
+        k: transform.k,
+      });
+
       gDay.attr("transform", transform);
     };
 
-    svg.call(
-      d3
-        .zoom()
-        .extent([
-          [0, 0],
-          [width, height],
-        ])
-        .scaleExtent([0, Infinity])
-        .on("zoom", zoomed),
-    );
+    svg
+      .call(zoom.on("zoom", zoomed))
+      .call(
+        zoom.transform,
+        d3.zoomIdentity.translate(dotCoords.x, dotCoords.y).scale(dotCoords.k),
+      );
+
+    const refToCleanUp = svgRef.current;
+    const mainSvgWrapper = document.querySelector("#main-svg-wrapper");
+    const tooltipDiv = document.querySelector("#tooltip");
 
     return () => {
-      svgRef.current = null;
+      if (refToCleanUp) {
+        refToCleanUp.innerHTML = "";
+      }
+
+      mainSvgWrapper?.removeChild(tooltipDiv);
     };
   }, [userTargetYearContents, userJournalList, data]);
 
   return (
     <>
       {userTargetYearContents && (
-        <MainWrapper id="main-svg">
-          <Main ref={svgRef} style={{ overflow: "visible" }}></Main>
+        <MainWrapper id="main-svg-wrapper">
+          <Main
+            id="main-svg-ref"
+            ref={svgRef}
+            style={{ overflow: "visible" }}
+          ></Main>
         </MainWrapper>
       )}
     </>
