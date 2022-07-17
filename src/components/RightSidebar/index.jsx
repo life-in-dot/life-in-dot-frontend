@@ -18,6 +18,13 @@ import useModal from "../../lib/hooks/useModal";
 
 function RightSidebar() {
   const queryClient = useQueryClient();
+  const { showModal } = useModal();
+
+  const [journalData, setJournalData] = useState({});
+  const loginData = useRecoilValue(loginState);
+  const [isFetchDone, setIsFetchDone] = useState(false);
+
+  const [isSidebarOpen, setIsSidebarOpen] = useRecoilState(sidebarState);
   const [currentJournalId, setCurrentJournalId] =
     useRecoilState(journalIdState);
   const [currentJournalDateId, setCurrentJournalDateId] = useRecoilState(
@@ -25,13 +32,8 @@ function RightSidebar() {
   );
   const [currentMusicId, setCurrentMusicId] =
     useRecoilState(currentMusicIdState);
-  const [journalData, setJournalData] = useState({});
-  const [isSidebarOpen, setIsSidebarOpen] = useRecoilState(sidebarState);
-
   const getJournalMutation = useMutation(getJournal);
   const updateJournalMutation = useMutation(updateJournal);
-  const loginData = useRecoilValue(loginState);
-  const { showModal } = useModal();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -76,6 +78,8 @@ function RightSidebar() {
       const userId = loginData?.data._id;
 
       if (isSidebarOpen && currentJournalId) {
+        setIsFetchDone(false);
+
         getJournalMutation.mutate(
           {
             userId,
@@ -86,6 +90,8 @@ function RightSidebar() {
               setJournalData(data);
               setCurrentJournalDateId(data.dateId);
               setCurrentJournalId(data._id);
+
+              setIsFetchDone(true);
             },
           },
         );
@@ -146,27 +152,31 @@ function RightSidebar() {
       </MusicWrapper>
       <JournalWrapper>
         <DeleteButton onClick={onDeleteClickHandler} />
-        <JournalTitle
-          name="journal-title"
-          placeholder="Write your title."
-          defaultValue={journalData.title}
-          onChange={e =>
-            setJournalData({
-              title: e.target.value,
-            })
-          }
-        />
-        <JournalContents
-          name="journal-contents"
-          placeholder="Write your day."
-          defaultValue={journalData.contents}
-          onChange={e => {
-            setJournalData(data => {
-              data.contents = e.target.value;
-              return data;
-            });
-          }}
-        ></JournalContents>
+        {isFetchDone && (
+          <>
+            <JournalTitle
+              name="journal-title"
+              placeholder="Write your title."
+              defaultValue={journalData.title}
+              onChange={e =>
+                setJournalData({
+                  title: e.target.value,
+                })
+              }
+            />
+            <JournalContents
+              name="journal-contents"
+              placeholder="Write your day."
+              defaultValue={journalData.contents}
+              onChange={e => {
+                setJournalData(data => {
+                  data.contents = e.target.value;
+                  return data;
+                });
+              }}
+            />
+          </>
+        )}
       </JournalWrapper>
     </Sidebar>
   );

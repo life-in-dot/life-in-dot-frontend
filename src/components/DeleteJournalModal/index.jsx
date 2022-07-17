@@ -1,25 +1,28 @@
-import { useRecoilValue, useSetRecoilState } from "recoil";
-import { useMutation } from "react-query";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useMutation, useQueryClient } from "react-query";
 
 import styled from "styled-components";
 import { GrFormClose } from "react-icons/gr";
 
 import loginState from "../../lib/recoil/auth";
 import sidebarState from "../../lib/recoil/sidebar";
-import journalIdState from "../../lib/recoil/currentJournalId";
+import currentJournalIdState from "../../lib/recoil/currentJournalId";
 import currentMusicIdState from "../../lib/recoil/currentMusic";
 
 import { deleteJournal } from "../../lib/api";
 import useModal from "../../lib/hooks/useModal";
 
 function DeleteJournalModal() {
-  const setIsSidebarOpen = useSetRecoilState(sidebarState);
-  const setCurrentMusicId = useSetRecoilState(currentMusicIdState);
-  const setCurrentJournalId = useSetRecoilState(currentMusicIdState);
-  const currentJournalId = useRecoilValue(journalIdState);
-  const deleteJournalMutation = useMutation(deleteJournal);
-  const loginData = useRecoilValue(loginState);
   const { hideModal } = useModal();
+  const queryClient = useQueryClient();
+  const loginData = useRecoilValue(loginState);
+
+  const setIsSidebarOpen = useSetRecoilState(sidebarState);
+  const [currentJournalId, setCurrentJournalId] = useRecoilState(
+    currentJournalIdState,
+  );
+  const setCurrentMusicId = useSetRecoilState(currentMusicIdState);
+  const deleteJournalMutation = useMutation(deleteJournal);
 
   const onDeleteClickHandler = () => {
     const userId = loginData?.data._id;
@@ -28,11 +31,12 @@ function DeleteJournalModal() {
       { userId, journalId: currentJournalId },
       {
         onSuccess: () => {
-          setIsSidebarOpen(false);
           setCurrentMusicId("");
           setCurrentJournalId("");
           setIsSidebarOpen(false);
           hideModal();
+
+          queryClient.invalidateQueries("getJournalList");
         },
       },
     );
@@ -41,7 +45,7 @@ function DeleteJournalModal() {
   return (
     <Wrapper>
       <CloseButton onClick={hideModal} />
-      <LogoImage src="/assets/life-in-dot.-favicon.png"></LogoImage>
+      <LogoImage src="/assets/life-in-dot.png"></LogoImage>
       <ButtonWrapper>
         <ConfirmButton onClick={onDeleteClickHandler}>Delete</ConfirmButton>
         <ConfirmButton onClick={hideModal}>Close</ConfirmButton>
