@@ -8,8 +8,8 @@ import useModal from "../../lib/hooks/useModal";
 
 function Profile() {
   const navigate = useNavigate();
-  const setLoginState = useSetRecoilState(loginState);
   const { hideModal } = useModal();
+  const setLoginState = useSetRecoilState(loginState);
 
   const handleLogout = () => {
     localStorage.clear();
@@ -23,7 +23,7 @@ function Profile() {
   return (
     <Wrapper>
       <Brand>
-        <BrandImage src="/assets/life-in-dot.-favicon.png" />
+        <BrandImage src="/assets/life-in-dot.png" />
         <BrandTitle>life in dot.</BrandTitle>
         <LogoutButton onClick={handleLogout}>로그아웃</LogoutButton>
       </Brand>

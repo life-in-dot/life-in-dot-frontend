@@ -15,10 +15,11 @@ import useModal from "../../lib/hooks/useModal";
 
 function Login() {
   const navigate = useNavigate();
-  const setLoginState = useSetRecoilState(loginState);
-  const dateOfBirth = useRecoilValue(birthday);
-  const loginMutation = useMutation(login);
   const { hideModal } = useModal();
+
+  const dateOfBirth = useRecoilValue(birthday);
+  const setLoginState = useSetRecoilState(loginState);
+  const loginMutation = useMutation(login);
 
   const decodeJWT = token => {
     const userProfile = JSON.parse(window.atob(token.split(".")[1]));
@@ -57,7 +58,7 @@ function Login() {
   return (
     <Wrapper>
       <CloseButton onClick={hideModal} />
-      <LogoImage src="/assets/life-in-dot.-favicon.png"></LogoImage>
+      <LogoImage src="/assets/life-in-dot.png"></LogoImage>
       <div id="google-login"></div>
     </Wrapper>
   );
