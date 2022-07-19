@@ -186,13 +186,12 @@ const Sidebar = styled.div`
   display: flex;
   position: sticky;
   flex: ${props => (props.sidebar ? "0 1 40%" : "0 1 0%")};
-  top: 70px;
-  height: calc(100vh - 70px);
   overflow: hidden scroll;
   overflow-y: scroll;
   flex-direction: column;
   background: radial-gradient(#ec8686, #9da3e9);
   opacity: 0.8;
+  height: 100vh;
   transition: all 200ms ease-in 0s;
   box-shadow: 0 6px 10px 0 rgb(0 0 0 / 8%), 0 0 2px 0 rgb(34 188 94 / 15%);
 `;
