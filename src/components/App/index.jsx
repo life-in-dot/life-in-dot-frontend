@@ -14,7 +14,6 @@ import ProtectedRoute from "../ProtectedRoute";
 import MainPage from "../../pages/MainPage";
 import LifePage from "../../pages/LifePage";
 import YearPage from "../../pages/YearPage";
-import FocusPage from "../../pages/FocusPage";
 
 import Loading from "../Loading";
 
@@ -56,7 +55,6 @@ function App() {
                   <Route element={<ProtectedRoute />}>
                     <Route path="/life" element={<LifePage />}></Route>
                     <Route path="/year" element={<YearPage />}></Route>
-                    <Route path="/focus" element={<FocusPage />}></Route>
                   </Route>
                 </Routes>
               </Main>
