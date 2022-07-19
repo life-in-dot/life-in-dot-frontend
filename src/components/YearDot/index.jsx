@@ -20,6 +20,7 @@ import { getJournalList, createJournal } from "../../lib/api";
 import insertDataByDateId from "../../lib/utils/insertDataByDateId";
 import { makeRadialGradient } from "../../lib/utils/makeGradientColors";
 import createTooltip from "../../lib/utils/createTooltip";
+import createAxis from "../../lib/utils/createAxis";
 
 function YearDot() {
   const navigate = useNavigate();
@@ -47,6 +48,7 @@ function YearDot() {
     ["getJournalList", userId],
     () => getJournalList({ userId }),
     {
+      enabled: !!userId,
       select: response => response.data,
       onSuccess: data => {
         setUserTargetYearContents(insertDataByDateId(data, userTargetYearData));
@@ -62,7 +64,7 @@ function YearDot() {
     const svg = d3
       .select(svgRef.current)
       .append("svg")
-      .attr("class", "year-board")
+      .attr("class", "year-svg")
       .attr("height", "100%")
       .attr("width", "100%")
       .attr("viewBox", [0, 0, viewWidth / 2, viewHeight / 2])
@@ -88,10 +90,7 @@ function YearDot() {
     const max = d3.max(userJournalList, d => d.contentsSize);
     const rScale = d3.scaleLinear().domain([min, max]).range([0.02, 0.04]);
 
-    const gDay = svg
-      .append("g", "year-board")
-      .attr("class", "day-dots")
-      .attr("transform", `translate(${0},${0})`);
+    const gDay = svg.append("g", "year-board").attr("class", "day-dots");
 
     const dayDots = gDay
       .selectAll("circle")
@@ -116,7 +115,7 @@ function YearDot() {
           .style("top", `${e.clientY - 60}px`)
           .style("left", `${e.clientX - 50}px`),
       )
-      .on("mouseout", e => tooltip.style("visibility", "hidden"))
+      .on("mouseout", () => tooltip.style("visibility", "hidden"))
       .on("click", e => {
         const targetDate = e.target.getAttribute("id");
         const journalId = e.target.getAttribute("journalId");
@@ -162,6 +161,18 @@ function YearDot() {
           })();
         }
       });
+
+    const gyAxis = createAxis(gDay, "yAxisDay", ".day-dots");
+    gyAxis.attr(
+      "transform",
+      `translate(${viewWidth / 5 + 3},${viewHeight / 12})`,
+    );
+
+    const gxAxis = createAxis(gDay, "xAxisMonth", ".day-dots");
+    gxAxis.attr(
+      "transform",
+      `translate(${viewWidth / 5 + 3},${viewHeight / 11 - 0.5})`,
+    );
 
     const zoom = d3
       .zoom()
@@ -223,7 +234,6 @@ const MainWrapper = styled.div`
 
 const Main = styled.div`
   background: radial-gradient(#ec8686, #9da3e9);
-  opacity: 0.8;
   transition: background-color 1s ease 0s;
   height: 100%;
   width: 100%;
