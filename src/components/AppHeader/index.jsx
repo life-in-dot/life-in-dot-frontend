@@ -5,6 +5,7 @@ import styled from "styled-components";
 import { TbUserCircle } from "react-icons/tb";
 
 import loginState, { isLoggedInState } from "../../lib/recoil/auth";
+import sidebarState from "../../lib/recoil/sidebar";
 
 import useModal from "../../lib/hooks/useModal";
 
@@ -12,6 +13,7 @@ function AppHeader() {
   const { showModal } = useModal();
   const isLoggedIn = useRecoilValue(isLoggedInState);
   const loginData = useRecoilValue(loginState);
+  const isSidebarOpen = useRecoilValue(sidebarState);
 
   const handleProfileClick = () => {
     showModal({
@@ -20,22 +22,24 @@ function AppHeader() {
   };
 
   return (
-    <Header>
-      <InnerHeader>
+    <Header sidebar={isSidebarOpen}>
+      <InnerHeader sidebar={isSidebarOpen}>
         <Link to={"/"}>
           <Brand>
             <BrandImage src="/assets/life-in-dot.png" />
             <BrandTitle>life in dot.</BrandTitle>
           </Brand>
         </Link>
-        {isLoggedIn ? (
-          <UserProfilePic
-            src={loginData.data.picture}
-            onClick={handleProfileClick}
-          />
-        ) : (
-          <UserImage onClick={handleProfileClick} />
-        )}
+        <ImageBlock>
+          {isLoggedIn ? (
+            <UserProfilePic
+              src={loginData.data.picture}
+              onClick={handleProfileClick}
+            />
+          ) : (
+            <UserImage onClick={handleProfileClick} />
+          )}
+        </ImageBlock>
       </InnerHeader>
     </Header>
   );
@@ -50,8 +54,6 @@ const Header = styled.div`
   justify-content: space-between;
   padding: 8px;
   box-sizing: border-box;
-  background: rgba(0, 0, 0, 0.2);
-  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
   height: 70px;
   width: 100%;
 
@@ -66,13 +68,15 @@ const InnerHeader = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  @media (min-width: 1024px) {
-    margin-left: 3%;
-    margin-right: 3%;
+  flex: ${props => (props.sidebar ? "0 1 56%" : "0 100%")};
+  margin-left: 3%;
+  margin-right: 3%;
+  @media (max-width: 1024px) {
+    flex: ${props => (props.sidebar ? "0 1 50%" : "0 100%")};
+    margin-left: 10%;
+    margin-right: 10%;
   }
-  margin-left: 10%;
-  margin-right: 10%;
-  transition: margin 1s ease 0s;
+  transition: all 200ms ease-in 0s;
   height: 100%;
   width: 100%;
 `;
@@ -88,16 +92,27 @@ const BrandImage = styled.img`
   height: 50px;
   width: 50px;
   margin-right: 15px;
+  border-radius: 30px;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
 `;
 
 const BrandTitle = styled.div`
   font-size: 1.2em;
   font-family: Helvetica, sans-serif;
   font-weight: bold;
+  color: rgba(255, 255, 255, 0.8);
+  text-shadow: 1px 2px 4px rgba(0, 0, 0, 0.2);
+`;
+
+const ImageBlock = styled.div`
+  display: block;
+  margin-right: 15px;
+  border-radius: 30px;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+  height: 35px;
 `;
 
 const UserProfilePic = styled.img`
-  margin-right: 15px;
   border-radius: 20px;
   height: 35px;
   width: 35px;
@@ -105,7 +120,6 @@ const UserProfilePic = styled.img`
   cursor: pointer;
 `;
 const UserImage = styled(TbUserCircle)`
-  margin-right: 15px;
   height: 30px;
   width: 30px;
   opacity: 0.8;
