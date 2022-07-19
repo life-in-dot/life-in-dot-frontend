@@ -86,8 +86,6 @@ function LifeDot() {
           );
         }
 
-        console.log(zoomScale);
-
         if (zoomScale > 80000) {
           setDotCoords({
             x: 0,

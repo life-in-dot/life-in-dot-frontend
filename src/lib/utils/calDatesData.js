@@ -1,8 +1,21 @@
-export default function calDatesData(datesOfTargetYear) {
+export default function calDatesData(
+  datesOfTargetYear,
+  targetYear,
+  userBirthDay,
+) {
   const oneYearData = [];
   let curMonth = 1;
   let col = 1;
   let row = 1;
+
+  const { year, month, date } = userBirthDay;
+  const birthYear = year;
+  const birthMonth = month;
+  const birthDate = date;
+
+  if (targetYear === birthYear) {
+    col = birthMonth - 1;
+  }
 
   datesOfTargetYear.forEach(targetDate => {
     const { year, month, date } = targetDate;
@@ -12,6 +25,10 @@ export default function calDatesData(datesOfTargetYear) {
       col++;
       row = 1;
       curMonth = month;
+    }
+
+    if (year === birthYear && month === birthMonth && row < birthDate) {
+      row += birthDate - 1;
     }
 
     oneYearData.push({

@@ -12,7 +12,8 @@ const targetYearDaysListState = selector({
     const userBirthday = get(birthdayState);
 
     const datesOfTargetYear = calDatesOfYear(userBirthday, targetYear);
-    const userTargetYearData = calDatesData(datesOfTargetYear) || [];
+    const userTargetYearData =
+      calDatesData(datesOfTargetYear, targetYear, userBirthday) || [];
 
     return userTargetYearData;
   },
