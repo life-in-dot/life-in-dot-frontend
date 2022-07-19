@@ -67,10 +67,48 @@ function LifeDot() {
       .attr("class", "life-board")
       .attr("height", "100%")
       .attr("width", "100%")
-      .attr("viewBox", [0, 0, width, height]);
+      .attr("viewBox", [0, 0, width, height])
+      .on("wheel", e => {
+        const zoomScale = svg._groups[0][0].__zoom.k;
+
+        if (zoomScale < 0.1) {
+          setDotCoords({
+            x: 0,
+            y: 0,
+            k: 1,
+          });
+
+          svg.call(
+            zoom.transform,
+            d3.zoomIdentity
+              .translate(dotCoords.x, dotCoords.y)
+              .scale(dotCoords.k),
+          );
+        }
+
+        console.log(zoomScale);
+
+        if (zoomScale > 80000) {
+          setDotCoords({
+            x: 0,
+            y: 0,
+            k: 1,
+          });
+
+          svg.call(
+            zoom.transform,
+            d3.zoomIdentity
+              .translate(dotCoords.x, dotCoords.y)
+              .scale(dotCoords.k),
+          );
+        }
+      });
 
     const radialGradient = makeRadialGradient(svg, "normal");
     radialGradient.attr("id", "radial-gradient");
+
+    const radialDataGradient = makeRadialGradient(svg, "data");
+    radialDataGradient.attr("id", "radial-data-gradient");
 
     const tooltip = createTooltip("#main-svg", 70);
 
@@ -113,23 +151,29 @@ function LifeDot() {
           setUserTargetYear(+targetYear);
         }
 
-        if (zoomScale > 50000 && e.deltaY < 0 && location.state !== "year") {
+        if (zoomScale > 40000 && e.deltaY < 0 && location.state !== "year") {
           navigate("/year", { replace: false });
         }
 
         location.state = "";
       })
-      .on("mouseover", (e, d) =>
+      .on("mouseover", (e, d) => {
         tooltip
           .style("visibility", "visible")
-          .text(`It's ${d.year}, you're ${d.year - dateOfBirth.year + 1}`),
-      )
+          .text(`It's ${d.year}, you're ${d.year - dateOfBirth.year + 1}`);
+
+        e.target.style.fill = "url(#radial-data-gradient)";
+      })
       .on("mousemove", e =>
         tooltip
           .style("top", `${e.clientY - 60}px`)
           .style("left", `${e.clientX - 50}px`),
       )
-      .on("mouseout", () => tooltip.style("visibility", "hidden"));
+      .on("mouseout", e => {
+        tooltip.style("visibility", "hidden");
+
+        e.target.style.fill = "url(#radial-gradient)";
+      });
 
     const zoom = d3
       .zoom()
@@ -177,7 +221,6 @@ const MainWrapper = styled.div`
 const Main = styled.div`
   height: 100%;
   width: 100%;
-  z-index: 99999;
 `;
 
 export default LifeDot;

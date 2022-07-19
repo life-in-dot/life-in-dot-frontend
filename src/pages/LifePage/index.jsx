@@ -1,10 +1,9 @@
-import { lazy, Suspense } from "react";
+import { Suspense } from "react";
 
 import styled from "styled-components";
 
 import Loading from "../../components/Loading";
-
-const LifeDot = lazy(() => import("../../components/LifeDot"));
+import LifeDot from "../../components/LifeDot";
 
 function LifePage() {
   return (
@@ -21,8 +20,7 @@ const Wrapper = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin-top: 70px;
-  height: calc(100vh - 70px);
+  height: 100vh;
   width: 100vw;
 `;
 
