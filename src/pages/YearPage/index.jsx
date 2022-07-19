@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { Suspense } from "react";
 import { useRecoilValue } from "recoil";
 
 import styled from "styled-components";
@@ -6,9 +6,8 @@ import styled from "styled-components";
 import sidebarState from "../../lib/recoil/sidebar";
 
 import Loading from "../../components/Loading";
-
-const YearDot = lazy(() => import("../../components/YearDot"));
-const RightSidebar = lazy(() => import("../../components/RightSidebar"));
+import YearDot from "../../components/YearDot";
+import RightSidebar from "../../components/RightSidebar";
 
 function YearPage() {
   const isSidebarOpen = useRecoilValue(sidebarState);
@@ -30,8 +29,7 @@ const Wrapper = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  margin-top: 70px;
-  height: calc(100vh - 70px);
+  height: 100vh;
   width: 100vw;
 `;
 
