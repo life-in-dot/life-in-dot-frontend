@@ -32,12 +32,12 @@ export default function createAxis(gElements, axisType, id) {
     ];
 
     const elementGroup = document.querySelector(`${id}`);
-    const yAxisWidth = elementGroup.getBBox().width;
+    const xAxisWidth = elementGroup.getBBox().width;
 
     const xAxisScale = d3
       .scalePoint()
       .domain(xAxisData)
-      .range([1, yAxisWidth - yAxisWidth / 15]);
+      .range([1, xAxisWidth - xAxisWidth / 15]);
 
     axis = d3.axisTop(xAxisScale);
   }

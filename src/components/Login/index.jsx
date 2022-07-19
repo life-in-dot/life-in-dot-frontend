@@ -7,7 +7,7 @@ import styled from "styled-components";
 import { GrFormClose } from "react-icons/gr";
 
 import loginState from "../../lib/recoil/auth";
-import birthday from "../../lib/recoil/userYears";
+import birthday, { hundredyearsListState } from "../../lib/recoil/userYears";
 
 import { login } from "../../lib/api";
 import config from "../../lib/config";
@@ -19,6 +19,7 @@ function Login() {
 
   const dateOfBirth = useRecoilValue(birthday);
   const setLoginState = useSetRecoilState(loginState);
+  const setUserHundredYearsData = useSetRecoilState(hundredyearsListState);
   const loginMutation = useMutation(login);
 
   const decodeJWT = token => {
@@ -36,6 +37,7 @@ function Login() {
         onSuccess: ({ data }) => {
           setLoginState(data);
           localStorage.setItem("loginData", JSON.stringify(data));
+          setUserHundredYearsData(data.data.dateOfBirth);
 
           hideModal();
           navigate("/life", { replace: true });

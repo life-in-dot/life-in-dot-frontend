@@ -2,7 +2,6 @@ import { useRecoilValue, useSetRecoilState } from "recoil";
 
 import styled from "styled-components";
 
-import loginState from "../../lib/recoil/auth";
 import birthdayState, {
   hundredyearsListState,
 } from "../../lib/recoil/userYears";
@@ -21,7 +20,6 @@ function MainPage() {
     birthDate: date,
   });
 
-  const loginData = useRecoilValue(loginState);
   const { showModal } = useModal();
 
   const handleWheelChange = e => {
@@ -32,19 +30,11 @@ function MainPage() {
   const handleSubmit = e => {
     e.preventDefault();
 
-    if (loginData) {
-      setUserHundredYearsData({
-        year,
-        month,
-        date,
-      });
-    } else {
-      setUserHundredYearsData({
-        year: birthYear,
-        month: birthMonth,
-        date: birthDate,
-      });
-    }
+    setUserHundredYearsData({
+      year: birthYear,
+      month: birthMonth,
+      date: birthDate,
+    });
   };
 
   const handleLoginClick = () => {
