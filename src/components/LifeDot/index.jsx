@@ -78,12 +78,7 @@ function LifeDot() {
             k: 1,
           });
 
-          svg.call(
-            zoom.transform,
-            d3.zoomIdentity
-              .translate(dotCoords.x, dotCoords.y)
-              .scale(dotCoords.k),
-          );
+          svg.call(zoom.transform, d3.zoomIdentity.translate(0, 0).scale(1));
         }
 
         if (zoomScale > 80000) {
@@ -93,12 +88,7 @@ function LifeDot() {
             k: 1,
           });
 
-          svg.call(
-            zoom.transform,
-            d3.zoomIdentity
-              .translate(dotCoords.x, dotCoords.y)
-              .scale(dotCoords.k),
-          );
+          svg.call(zoom.transform, d3.zoomIdentity.translate(0, 0).scale(1));
         }
       });
 
@@ -149,8 +139,8 @@ function LifeDot() {
           setUserTargetYear(+targetYear);
         }
 
-        if (zoomScale > 40000 && e.deltaY < 0 && location.state !== "year") {
-          navigate("/year", { replace: false });
+        if (zoomScale > 30000 && e.deltaY < 0 && location.state !== "day") {
+          navigate("/day", { replace: false });
         }
 
         location.state = "";

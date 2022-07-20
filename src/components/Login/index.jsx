@@ -40,7 +40,7 @@ function Login() {
           setUserHundredYearsData(data.data.dateOfBirth);
 
           hideModal();
-          navigate("/life", { replace: true });
+          navigate("/year", { replace: true });
         },
       },
     );
