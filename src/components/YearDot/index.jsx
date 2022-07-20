@@ -74,7 +74,7 @@ function YearDot() {
         if (zoomScale < 1.2 && e.deltaY > 0) {
           setIsSidebarOpen(false);
 
-          navigate("/life", { replace: false, state: "year" });
+          navigate("/year", { replace: false, state: "day" });
         }
       });
 

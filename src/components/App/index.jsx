@@ -53,8 +53,8 @@ function App() {
                 <Routes>
                   <Route path="/" element={<MainPage />}></Route>
                   <Route element={<ProtectedRoute />}>
-                    <Route path="/life" element={<LifePage />}></Route>
-                    <Route path="/year" element={<YearPage />}></Route>
+                    <Route path="/year" element={<LifePage />}></Route>
+                    <Route path="/day" element={<YearPage />}></Route>
                   </Route>
                 </Routes>
               </Main>
