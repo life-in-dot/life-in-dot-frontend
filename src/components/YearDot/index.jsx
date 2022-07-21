@@ -14,7 +14,7 @@ import userJournalListState from "../../lib/recoil/userJournals";
 import currentJournalIdState from "../../lib/recoil/currentJournalId";
 import currentJournalDateIdState from "../../lib/recoil/currentJournalDateId";
 import currentMusicIdState from "../../lib/recoil/currentMusic";
-import yearDotCoordsState from "../../lib/recoil/yearDotCoords";
+import dayDotCoordsState from "../../lib/recoil/dayDotCoords";
 
 import { getJournalList, createJournal } from "../../lib/api";
 import insertDataByDateId from "../../lib/utils/insertDataByDateId";
@@ -41,7 +41,7 @@ function YearDot() {
   const setCurrentJournalId = useSetRecoilState(currentJournalIdState);
   const setCurrentJournalDateId = useSetRecoilState(currentJournalDateIdState);
   const setCurrentMusicId = useSetRecoilState(currentMusicIdState);
-  const [dotCoords, setDotCoords] = useRecoilState(yearDotCoordsState);
+  const [dotCoords, setDotCoords] = useRecoilState(dayDotCoordsState);
   const createJournalMutation = useMutation(createJournal);
 
   const { data } = useQuery(
@@ -76,6 +76,16 @@ function YearDot() {
 
           navigate("/year", { replace: false, state: "day" });
         }
+
+        if (zoomScale > 10000) {
+          setDotCoords({
+            x: 0,
+            y: 0,
+            k: 1,
+          });
+
+          svg.call(zoom.transform, d3.zoomIdentity.translate(0, 0).scale(1));
+        }
       });
 
     const radialGradient = makeRadialGradient(svg, "normal");
@@ -97,8 +107,8 @@ function YearDot() {
       .data(userTargetYearContents)
       .join("circle")
       .attr("r", d => (d.contentsSize ? rScale(d.contentsSize) : d.r * 5))
-      .attr("cx", d => viewWidth / 5 + d.y * 4)
-      .attr("cy", d => viewHeight / 12 + d.x * 4)
+      .attr("cx", d => viewWidth / 5 + d.y * 5)
+      .attr("cy", d => viewHeight / 12 + d.x * 5)
       .attr("id", d => d.dateId)
       .attr("journalId", d => d.journalId)
       .attr("musicUrl", d => d.musicUrl)

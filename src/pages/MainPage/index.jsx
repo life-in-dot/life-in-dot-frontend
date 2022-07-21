@@ -138,10 +138,9 @@ const InputFieldDiv = styled.div`
   box-shadow: 0 2px 30px 0 rgba(255, 255, 255, 0.2);
 
   :hover {
-    border: 1px solid #b8d0d5;
     opacity: 0.8;
     background-color: rgba(255, 255, 255, 0.2);
-    cursor: ns-resize;
+    box-shadow: 0 2px 30px 0 rgba(255, 255, 255, 0.4);
   }
 `;
 
@@ -155,7 +154,7 @@ const InputField = styled.input`
   text-align: center;
   @media (max-width: 780px) {
     padding-left: 0px;
-    height: 50px;
+    height: 90px;
     width: 3rem;
   }
   padding-left: 14px;
@@ -165,6 +164,11 @@ const InputField = styled.input`
   color: rgba(255, 255, 255, 0.8);
   opacity: 0.8;
   transition: all 200ms ease-in 0s;
+  outline: none;
+
+  :hover {
+    cursor: ns-resize;
+  }
 `;
 
 const ScrollIcon = styled(CgScrollV)`
@@ -172,7 +176,6 @@ const ScrollIcon = styled(CgScrollV)`
   width: 30px;
   color: rgba(255, 255, 255, 0.8);
   opacity: 0.8;
-  cursor: pointer;
 `;
 
 const Heading = styled.div`
