@@ -13,7 +13,8 @@ import targetYearState, {
 } from "../../lib/recoil/targetYear";
 import targetYearContentsListState from "../../lib/recoil/yearContents";
 import userJournalListState from "../../lib/recoil/userJournals";
-import lifeDotCoordsState from "../../lib/recoil/lifeDotCoords";
+import yearDotCoordsState from "../../lib/recoil/yearDotCoords";
+import dayDotCoordsState from "../../lib/recoil/dayDotCoords";
 
 import { getJournalList } from "../../lib/api";
 import insertDataByDateId from "../../lib/utils/insertDataByDateId";
@@ -36,7 +37,8 @@ function LifeDot() {
     targetYearContentsListState,
   );
   const setUserJournalList = useSetRecoilState(userJournalListState);
-  const [dotCoords, setDotCoords] = useRecoilState(lifeDotCoordsState);
+  const [dotCoords, setDotCoords] = useRecoilState(yearDotCoordsState);
+  const setDayDotCoords = useSetRecoilState(dayDotCoordsState);
   const getJournalListMutation = useMutation(getJournalList);
 
   useEffect(() => {
@@ -140,6 +142,12 @@ function LifeDot() {
         }
 
         if (zoomScale > 30000 && e.deltaY < 0 && location.state !== "day") {
+          setDayDotCoords({
+            x: 0,
+            y: 0,
+            k: 1,
+          });
+
           navigate("/day", { replace: false });
         }
 
