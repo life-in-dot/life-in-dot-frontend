@@ -119,6 +119,7 @@ const UserProfilePic = styled.img`
   opacity: 0.8;
   cursor: pointer;
 `;
+
 const UserImage = styled(TbUserCircle)`
   height: 30px;
   width: 30px;
