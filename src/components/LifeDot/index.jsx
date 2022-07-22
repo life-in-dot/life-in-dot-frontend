@@ -101,9 +101,6 @@ function LifeDot() {
     const radialDataGradient = makeRadialGradient(svg, "data");
     radialDataGradient.attr("id", "radial-data-gradient");
 
-    const glowFilter = makeGlowEffect(svg, 1.5);
-    glowFilter.attr("id", "glow-filter");
-
     const tooltip = createTooltip("#main-svg", 70);
 
     const gLife = svg.append("g", "life-board").attr("class", "life-dot");
@@ -115,7 +112,6 @@ function LifeDot() {
       .attr("cx", () => width / 2)
       .attr("cy", () => height / 2)
       .attr("fill", "url(#radial-gradient)")
-      .attr("filter", "url(#glow-filter)")
       .attr("opacity", 0.8)
       .append("animate")
       .attr("id", "animate-dots")
