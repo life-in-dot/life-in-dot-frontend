@@ -7,6 +7,8 @@ import Login from "../Login";
 import Profile from "../Profile";
 import SaveMusicModal from "../SaveMusicModal";
 import DeleteJournalModal from "../DeleteJournalModal";
+import ConfirmModal from "../ConfirmModal";
+import ErrorModal from "../ErrorModal";
 
 function GlobalModal() {
   const { modalType, modalProps } = useRecoilValue(modalState) || {};
@@ -37,7 +39,9 @@ function GlobalModal() {
         </Modal>
       );
     case "ConfirmModal":
-      return <Modal>{modalProps.message}</Modal>;
+      return <ConfirmModal>{modalProps.message}</ConfirmModal>;
+    case "ErrorModal":
+      return <ErrorModal>{modalProps.message}</ErrorModal>;
   }
 }
 

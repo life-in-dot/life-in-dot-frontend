@@ -61,7 +61,9 @@ function Login() {
     <Wrapper>
       <CloseButton onClick={hideModal} />
       <LogoImage src="/assets/life-in-dot.png"></LogoImage>
-      <div id="google-login"></div>
+      <GoogleButton>
+        <div id="google-login"></div>
+      </GoogleButton>
     </Wrapper>
   );
 }
@@ -83,12 +85,20 @@ const LogoImage = styled.img`
   width: 60px;
 `;
 
+const GoogleButton = styled.div`
+  opacity: 0.8;
+
+  :hover {
+    opacity: 1;
+  }
+`;
 const CloseButton = styled(GrFormClose)`
   position: absolute;
   top: 5%;
   left: 90%;
   height: 30px;
   width: 30px;
+  opacity: 0.7;
   cursor: pointer;
 `;
 
