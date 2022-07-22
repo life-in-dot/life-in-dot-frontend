@@ -1,44 +1,51 @@
-import { useNavigate } from "react-router-dom";
-import { useSetRecoilState } from "recoil";
+import ReactDom from "react-dom";
 
 import styled from "styled-components";
 import { GrFormClose } from "react-icons/gr";
 
-import loginState from "../../lib/recoil/auth";
 import useModal from "../../lib/hooks/useModal";
 
-function Profile() {
-  const navigate = useNavigate();
+export default function ConfirmModal({ children }) {
   const { hideModal } = useModal();
-  const setLoginState = useSetRecoilState(loginState);
 
-  const handleLogout = () => {
-    localStorage.clear();
-    setLoginState(null);
-
-    hideModal();
-
-    navigate("/");
-  };
-
-  return (
-    <Wrapper>
-      <CloseButton onClick={hideModal} />
-      <Brand>
-        <BrandImage src="/assets/life-in-dot.png" />
-        <BrandTitle>life in dot.</BrandTitle>
-        <LogoutButton onClick={handleLogout}>로그아웃</LogoutButton>
-      </Brand>
-    </Wrapper>
+  return ReactDom.createPortal(
+    <ModalOverlay onClick={hideModal}>
+      <ModalContainer onClick={e => e.stopPropagation()}>
+        <Brand>
+          <CloseButton onClick={hideModal} />
+          <BrandImage src="/assets/life-in-dot.png" />
+          <BrandMessage>{children}</BrandMessage>
+          <ConfirmButton onClick={hideModal}>확인</ConfirmButton>
+        </Brand>
+      </ModalContainer>
+    </ModalOverlay>,
+    document.getElementById("portal"),
   );
 }
 
-const Wrapper = styled.div`
+const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 99999;
+`;
+
+const ModalContainer = styled.div`
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 500px;
+  height: 350px;
+  transform: translate(-50%, -50%);
   display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  width: 100%;
+  flex-direction: column;
+  background-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 2px 30px 0 rgba(255, 255, 255, 0.8);
+  border-radius: 20px;
+  z-index: 999999;
 `;
 
 const Brand = styled.div`
@@ -54,17 +61,15 @@ const BrandImage = styled.img`
   height: 50px;
   width: 50px;
   margin-right: 15px;
-  /* box-shadow: 0 2px 5px 1px rgb(64 60 67 / 16%); */
-  box-shadow: 0 2px 10px 1px rgba(105, 201, 188, 0.4);
-  border-radius: 100px;
 `;
 
-const BrandTitle = styled.div`
+const BrandMessage = styled.div`
   padding-top: 30px;
   padding-bottom: 30px;
   font-size: 1.2em;
   font-family: Helvetica, sans-serif;
   font-weight: bold;
+  opacity: 0.8;
 `;
 
 const Button = styled.button`
@@ -81,7 +86,7 @@ const Button = styled.button`
   }
 `;
 
-const LogoutButton = styled(Button)`
+const ConfirmButton = styled(Button)`
   border: none;
   background: rgba(105, 201, 188, 0.6);
   opacity: 0.8;
@@ -105,5 +110,3 @@ const CloseButton = styled(GrFormClose)`
   opacity: 0.7;
   cursor: pointer;
 `;
-
-export default Profile;

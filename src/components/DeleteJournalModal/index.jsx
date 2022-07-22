@@ -71,15 +71,6 @@ const LogoImage = styled.img`
   width: 60px;
 `;
 
-const CloseButton = styled(GrFormClose)`
-  position: absolute;
-  top: 5%;
-  left: 90%;
-  height: 30px;
-  width: 30px;
-  cursor: pointer;
-`;
-
 const ButtonWrapper = styled.div`
   display: flex;
   flex-direction: row;
@@ -88,20 +79,43 @@ const ButtonWrapper = styled.div`
 `;
 
 const Button = styled.button`
-  box-shadow: 0 2px 5px 1px rgb(64 60 67 / 16%);
   border-radius: 10px;
   height: 40px;
   width: 40%;
-  cursor: pointer;
+  box-shadow: 0 2px 15px 0 rgba(105, 201, 188, 0.4);
+  transition: all 200ms ease-in 0s;
+
+  :hover {
+    opacity: 0.8;
+    box-shadow: 0 2px 15px 0 rgba(105, 201, 188, 0.8);
+    cursor: pointer;
+  }
 `;
 
 const ConfirmButton = styled(Button)`
   margin: 40px auto;
-  border: 1px solid #69c9bc;
-  background: #69c9bc;
+  border: none;
+  background: rgba(105, 201, 188, 0.6);
   opacity: 0.8;
   font-size: 1em;
   color: white;
+  transition: all 200ms ease-in 0s;
+
+  :hover {
+    background: rgba(105, 201, 188, 0.8);
+    box-shadow: 0 2px 15px 0 rgba(105, 201, 188, 0.9);
+    opacity: 1;
+  }
+`;
+
+const CloseButton = styled(GrFormClose)`
+  position: absolute;
+  top: 5%;
+  left: 90%;
+  height: 30px;
+  width: 30px;
+  opacity: 0.7;
+  cursor: pointer;
 `;
 
 export default DeleteJournalModal;

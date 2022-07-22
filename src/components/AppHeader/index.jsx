@@ -21,6 +21,12 @@ function AppHeader() {
     });
   };
 
+  const handleLoginClick = () => {
+    showModal({
+      modalType: "LoginModal",
+    });
+  };
+
   return (
     <Header sidebar={isSidebarOpen}>
       <InnerHeader sidebar={isSidebarOpen}>
@@ -37,7 +43,7 @@ function AppHeader() {
               onClick={handleProfileClick}
             />
           ) : (
-            <UserImage onClick={handleProfileClick} />
+            <UserImage onClick={handleLoginClick} />
           )}
         </ImageBlock>
       </InnerHeader>

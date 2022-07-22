@@ -36,8 +36,8 @@ const ModalContainer = styled.div`
   transform: translate(-50%, -50%);
   display: flex;
   flex-direction: column;
-  background-color: #fff;
-  box-shadow: 0px 8px 30px;
+  background-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 2px 30px 0 rgba(255, 255, 255, 0.8);
   border-radius: 20px;
   z-index: 999999;
 `;
