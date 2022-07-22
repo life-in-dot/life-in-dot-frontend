@@ -1,7 +1,7 @@
 export default function makeGlowEffect(svg, blurSize) {
   const defs = svg.append("defs");
 
-  const glowFilter = defs.append("filter");
+  const glowFilter = defs.append("filter").attr("id", "glow-filter");
   glowFilter
     .append("feGaussianBlur")
     .attr("stdDeviation", `${blurSize}`)
