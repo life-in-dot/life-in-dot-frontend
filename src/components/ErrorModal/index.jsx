@@ -60,6 +60,8 @@ const BrandImage = styled.img`
   height: 50px;
   width: 50px;
   margin-right: 15px;
+  box-shadow: 0 2px 10px 1px rgba(105, 201, 188, 0.4);
+  border-radius: 100px;
 `;
 
 const BrandMessage = styled.div`

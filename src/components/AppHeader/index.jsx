@@ -99,7 +99,8 @@ const BrandImage = styled.img`
   width: 50px;
   margin-right: 15px;
   border-radius: 30px;
-  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 10px 5px rgba(105, 201, 188, 0.4);
+  border-radius: 100px;
 `;
 
 const BrandTitle = styled.div`
@@ -122,6 +123,7 @@ const UserProfilePic = styled.img`
   border-radius: 20px;
   height: 35px;
   width: 35px;
+  box-shadow: 0 2px 10px 1px rgba(0, 0, 0, 0.4);
   opacity: 0.8;
   cursor: pointer;
 `;

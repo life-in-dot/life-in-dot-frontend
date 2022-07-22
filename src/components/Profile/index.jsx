@@ -54,7 +54,6 @@ const BrandImage = styled.img`
   height: 50px;
   width: 50px;
   margin-right: 15px;
-  /* box-shadow: 0 2px 5px 1px rgb(64 60 67 / 16%); */
   box-shadow: 0 2px 10px 1px rgba(105, 201, 188, 0.4);
   border-radius: 100px;
 `;

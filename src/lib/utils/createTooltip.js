@@ -8,7 +8,7 @@ export default function createTooltip(id, width) {
     .style("display", "block")
     .style("position", "absolute")
     .style("width", `${width}px`)
-    .style("opacity", 0.8)
+    .style("opacity", 0.7)
     .style("font-size", "15px")
     .style("text-align", "center")
     .style("visibility", "hidden");
