@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import { BrowserRouter as Router } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { RecoilRoot } from "recoil";
 
 import AppHeader from "../components/AppHeader";
@@ -13,6 +13,9 @@ describe("AppHeader", () => {
       <RecoilRoot>
         <Router>
           <AppHeader />
+          <Routes>
+            <Route path="/" element={<MainPage />} />
+          </Routes>
         </Router>
       </RecoilRoot>,
     );
@@ -29,14 +32,6 @@ describe("AppHeader", () => {
 
     userEvent.click(brandLogo);
 
-    expect(
-      render(
-        <RecoilRoot>
-          <Router>
-            <MainPage />
-          </Router>
-        </RecoilRoot>,
-      ),
-    );
+    expect(screen.getByText("Login")).toBeInTheDocument();
   });
 });
