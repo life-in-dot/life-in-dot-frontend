@@ -19,6 +19,7 @@ import dayDotCoordsState from "../../lib/recoil/dayDotCoords";
 import { getJournalList } from "../../lib/api";
 import insertDataByDateId from "../../lib/utils/insertDataByDateId";
 import { makeRadialGradient } from "../../lib/utils/makeGradientColors";
+import makeGlowEffect from "../../lib/utils/makeGlowEffect";
 import createTooltip from "../../lib/utils/createTooltip";
 
 function LifeDot() {
@@ -70,7 +71,7 @@ function LifeDot() {
       .attr("height", "100%")
       .attr("width", "100%")
       .attr("viewBox", [0, 0, width, height])
-      .on("wheel", e => {
+      .on("wheel", () => {
         const zoomScale = svg._groups[0][0].__zoom.k;
 
         if (zoomScale < 0.1) {
@@ -100,6 +101,9 @@ function LifeDot() {
     const radialDataGradient = makeRadialGradient(svg, "data");
     radialDataGradient.attr("id", "radial-data-gradient");
 
+    const glowFilter = makeGlowEffect(svg, 1.5);
+    glowFilter.attr("id", "glow-filter");
+
     const tooltip = createTooltip("#main-svg", 70);
 
     const gLife = svg.append("g", "life-board").attr("class", "life-dot");
@@ -111,8 +115,8 @@ function LifeDot() {
       .attr("cx", () => width / 2)
       .attr("cy", () => height / 2)
       .attr("fill", "url(#radial-gradient)")
+      .attr("filter", "url(#glow-filter)")
       .attr("opacity", 0.8)
-      .attr("box-shadow", "0 2px 5px 1px rgb(64 60 67 / 16%)")
       .append("animate")
       .attr("id", "animate-dots")
       .attr("attributeName", "r")
@@ -130,9 +134,7 @@ function LifeDot() {
       .attr("cy", d => height / 2 + d.x / 10 - d.r * 5)
       .attr("id", d => `${d.year}`)
       .attr("class", "year-dot")
-      .attr("opacity", 0.7)
       .attr("fill", "url(#radial-gradient)")
-      .attr("box-shadow", "0 2px 5px 1px rgb(64 60 67 / 16%)")
       .on("wheel", e => {
         const zoomScale = svg._groups[0][0].__zoom.k;
         const targetYear = e.target.getAttribute("id");
