@@ -31,13 +31,17 @@ function SaveMusicModal() {
 
     let musicUrl;
 
-    if (!musicUrlInput.startsWith("https://www.youtube.com/watch?v=")) {
+    if (!musicUrlInput.startsWith("https://youtu")) {
       return setWrongInputWarn(true);
     }
 
     if (musicUrlInput.includes("&list=")) {
       const filteredMusicUrl = musicUrlInput.split("&list=")[0];
       const musirUrlStr = filteredMusicUrl.split("watch?v=")[1];
+
+      musicUrl = musirUrlStr;
+    } else if (musicUrlInput.includes("https://youtu.be/")) {
+      const musirUrlStr = musicUrlInput.split(".be/")[1];
 
       musicUrl = musirUrlStr;
     } else {
