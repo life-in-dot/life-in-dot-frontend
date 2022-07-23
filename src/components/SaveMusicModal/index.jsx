@@ -31,7 +31,7 @@ function SaveMusicModal() {
 
     let musicUrl;
 
-    if (!musicUrlInput.startsWith("https://youtu")) {
+    if (!musicUrlInput.startsWith("https://")) {
       return setWrongInputWarn(true);
     }
 
