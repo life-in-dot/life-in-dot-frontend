@@ -19,7 +19,6 @@ import dayDotCoordsState from "../../lib/recoil/dayDotCoords";
 import { getJournalList } from "../../lib/api";
 import insertDataByDateId from "../../lib/utils/insertDataByDateId";
 import { makeRadialGradient } from "../../lib/utils/makeGradientColors";
-import makeGlowEffect from "../../lib/utils/makeGlowEffect";
 import createTooltip from "../../lib/utils/createTooltip";
 
 function LifeDot() {
@@ -135,11 +134,11 @@ function LifeDot() {
         const zoomScale = svg._groups[0][0].__zoom.k;
         const targetYear = e.target.getAttribute("id");
 
-        if (zoomScale > 18000) {
+        if (zoomScale > 15000) {
           setUserTargetYear(+targetYear);
         }
 
-        if (zoomScale > 30000 && e.deltaY < 0 && location.state !== "day") {
+        if (zoomScale > 20000 && e.deltaY < 0 && location.state !== "day") {
           setDayDotCoords({
             x: 0,
             y: 0,
