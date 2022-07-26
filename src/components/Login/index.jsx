@@ -55,7 +55,7 @@ function Login() {
       theme: "outline",
       size: "large",
     });
-  });
+  }, []);
 
   return (
     <Wrapper>
