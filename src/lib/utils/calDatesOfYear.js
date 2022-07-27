@@ -6,7 +6,7 @@ const addOneDay = oneDay => {
   const newMonth = new Date(nextDateMillisec).getMonth() + 1;
   const newDate = new Date(nextDateMillisec).getDate();
 
-  const nextDay = `${newYear}-${newMonth}-${newDate}`;
+  const nextDay = `${newYear}/${newMonth}/${newDate}`;
 
   return nextDay;
 };
@@ -14,14 +14,14 @@ const addOneDay = oneDay => {
 const calDatesOfNormalYear = (targetYear, birthMonth = 1, birthDate = 1) => {
   const datesOfYear = [];
 
-  const firstDayOfNextYear = `${targetYear + 1}-${1}-${1}`;
-  let oneDay = `${targetYear}-${birthMonth}-${birthDate}`;
+  const firstDayOfNextYear = `${targetYear + 1}/${1}/${1}`;
+  let oneDay = `${targetYear}/${birthMonth}/${birthDate}`;
 
   do {
     datesOfYear.push({
-      year: +oneDay.split("-")[0],
-      month: +oneDay.split("-")[1],
-      date: +oneDay.split("-")[2],
+      year: +oneDay.split("/")[0],
+      month: +oneDay.split("/")[1],
+      date: +oneDay.split("/")[2],
     });
     oneDay = addOneDay(oneDay);
   } while (firstDayOfNextYear !== oneDay);
@@ -32,14 +32,14 @@ const calDatesOfNormalYear = (targetYear, birthMonth = 1, birthDate = 1) => {
 const calDatesOfLastYear = (targetYear, birthMonth, birthDate) => {
   const datesOfYear = [];
 
-  const lastBirthday = `${targetYear}-${birthMonth}-${birthDate}`;
-  let oneDay = `${targetYear}-${1}-${1}`;
+  const lastBirthday = `${targetYear}/${birthMonth}/${birthDate}`;
+  let oneDay = `${targetYear}/${1}/${1}`;
 
   do {
     datesOfYear.push({
-      year: +oneDay.split("-")[0],
-      month: +oneDay.split("-")[1],
-      date: +oneDay.split("-")[2],
+      year: +oneDay.split("/")[0],
+      month: +oneDay.split("/")[1],
+      date: +oneDay.split("/")[2],
     });
     oneDay = addOneDay(oneDay);
   } while (lastBirthday !== oneDay);
