@@ -68,7 +68,7 @@ function YearDot() {
       .attr("height", "100%")
       .attr("width", "100%")
       .attr("viewBox", [0, 0, viewWidth / 2, viewHeight / 2])
-      .on("wheel", e => {
+      .on("wheel touchmove", e => {
         const zoomScale = svg._groups[0][0].__zoom.k;
 
         if (zoomScale < 1.2 && e.deltaY > 0) {
@@ -117,16 +117,18 @@ function YearDot() {
       )
       .attr("opacity", 0.5)
       .attr("cursor", "pointer")
-      .on("mouseover", (e, d) => {
+      .on("mouseover touchstart pointerover", (e, d) => {
         tooltip.style("visibility", "visible").text(`${d.dateId}`);
       })
-      .on("mousemove", e =>
+      .on("mousemove touchstart pointermove", e =>
         tooltip
           .style("top", `${e.clientY - 60}px`)
           .style("left", `${e.clientX - 50}px`),
       )
-      .on("mouseout", () => tooltip.style("visibility", "hidden"))
-      .on("click", e => {
+      .on("mouseout touchend pointerout", () =>
+        tooltip.style("visibility", "hidden"),
+      )
+      .on("click pointerdown", e => {
         const targetDate = e.target.getAttribute("id");
         const journalId = e.target.getAttribute("journalId");
         const musicUrl = e.target.getAttribute("musicUrl");

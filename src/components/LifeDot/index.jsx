@@ -130,7 +130,7 @@ function LifeDot() {
       .attr("id", d => `${d.year}`)
       .attr("class", "year-dot")
       .attr("fill", "url(#radial-gradient)")
-      .on("wheel", e => {
+      .on("wheel touchmove", e => {
         const zoomScale = svg._groups[0][0].__zoom.k;
         const targetYear = e.target.getAttribute("id");
 
@@ -150,19 +150,19 @@ function LifeDot() {
 
         location.state = "";
       })
-      .on("mouseover", (e, d) => {
+      .on("mouseover touchstart pointerover", (e, d) => {
         tooltip
           .style("visibility", "visible")
           .text(`It's ${d.year}, you're ${d.year - dateOfBirth.year + 1}`);
 
         e.target.style.fill = "url(#radial-data-gradient)";
       })
-      .on("mousemove", e =>
+      .on("mousemove touchstart pointermove", e =>
         tooltip
           .style("top", `${e.clientY - 60}px`)
           .style("left", `${e.clientX - 50}px`),
       )
-      .on("mouseout", e => {
+      .on("mouseout touchend pointerout", e => {
         tooltip.style("visibility", "hidden");
 
         e.target.style.fill = "url(#radial-gradient)";
